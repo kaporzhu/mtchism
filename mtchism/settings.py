@@ -29,6 +29,9 @@ ALLOWED_HOSTS = ['mtchism.com', 'www.mtchism.com']
 
 # Application definition
 
+LOCAL_APPS = (
+)
+
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
@@ -36,7 +39,10 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-)
+
+    # 3rd apps
+    'south',
+) + LOCAL_APPS
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
