@@ -30,6 +30,7 @@ ALLOWED_HOSTS = ['mtchism.com', 'www.mtchism.com']
 # Application definition
 
 LOCAL_APPS = (
+    'foods',
 )
 
 INSTALLED_APPS = (
@@ -65,8 +66,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'mtchism',
-        'USERNAME': 'root',
-        'PASSWORD': '13616542277'
+        'USER': 'root',
+        'PASSWORD': '13616542277',
+        'HOST': '',
+        'PORT': '',
     }
 }
 
