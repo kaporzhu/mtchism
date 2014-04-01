@@ -1,0 +1,9 @@
+[run]
+omit =
+    fabfile/*
+    */migrations/*
+    */tests/*
+    mtchism/local_settings.py
+    mtchism/settings.py
+    mtchism/wsgi.py
+    */constants.py
