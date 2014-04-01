@@ -4,7 +4,7 @@ from django.core.urlresolvers import reverse_lazy
 from django.views.generic.base import RedirectView
 from django.views.generic.edit import FormView
 
-from .forms import LoginForm
+from .forms import LoginForm, RegisterForm
 
 
 class LoginView(FormView):
@@ -39,3 +39,12 @@ class LogoutView(RedirectView):
         """
         auth.logout(request)
         return super(LogoutView, self).get(request, *args, **kwargs)
+
+
+class RegisterView(FormView):
+    """
+    Register a new account
+    """
+    form_class = RegisterForm
+    template_name = 'accounts/register.html'
+    success_url = reverse_lazy('accounts:login')

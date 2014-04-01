@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 
-{% block title %}用户登录{% endblock %}
+{% block title %}新建账户{% endblock %}
 
 {% block extracss %}
 <link rel="stylesheet" href="{% static 'css/account.css' %}">
@@ -13,10 +13,11 @@
 
 {% block content %}
 <div class="row">
-    <h3 class="text-center">用户登录</h3>
+    <h3 class="text-center">新建账户</h3>
 </div>
+
 <div class="row">
-    <form method="post" class="form-horizontal col-md-6 col-md-offset-4" role="form">
+    <form method="post" class="form-horizontal col-md-offset-4 col-md-6" role="form">
         {% csrf_token %}
         {% for field in form %}
             <div class="form-group">
@@ -39,16 +40,15 @@
 
         {% if form.non_field_errors %}
         <div class="form-group">
-            <div class="col-md-6 col-md-offset-2">
+            <div class="col-md-offset-2 col-md-6">
                 <div class="alert alert-danger">{{ form.non_field_errors.0 }}</div>
             </div>
         </div>
         {% endif %}
 
         <div class="form-group">
-            <div class="col-md-10 col-md-offset-2">
-                <input class="btn btn-primary" type="submit" value="登录" />
-                <a href="{% url 'accounts:register' %}">还没账号？马上注册</a>
+            <div class="col-md-offset-2 col-md-10">
+                <input class="btn btn-primary" type="submit" value="创建" />
             </div>
         </div>
     </form>
