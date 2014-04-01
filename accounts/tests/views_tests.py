@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from django.contrib import auth
+from django.contrib.auth.models import User
 from django.test.testcases import TestCase
 
 from .mixins import AccountTestMixin
-from accounts.forms import LoginForm
-from accounts.views import LoginView, LogoutView
+from accounts.forms import LoginForm, RegisterForm
+from accounts.views import LoginView, LogoutView, RegisterView
 
 
 class LoginViewTests(AccountTestMixin, TestCase):
@@ -56,3 +57,18 @@ class LogoutViewTests(AccountTestMixin, TestCase):
         self.assertTrue(view.request.user.is_authenticated())
         view.get(view.request)
         self.assertFalse(view.request.user.is_authenticated())
+
+
+class RegisterViewTests(TestCase):
+    """
+    Tests for RegisterView
+    """
+    def test_form_valid(self):
+        """
+        Check if the new user object is created
+        """
+        view = RegisterView()
+        form = RegisterForm()
+        form.cleaned_data = {'username': '12345678912', 'password': '123'}
+        view.form_valid(form)
+        self.assertTrue(User.objects.filter(username='12345678912').exists())
