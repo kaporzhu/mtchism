@@ -2,13 +2,26 @@
 
 {% block content %}
 
-{% for msg in messages %}
-    {{ msg|safe }}
-{% endfor %}
+<div class="row">
+    <div class="col-md-12">
+        <ul class="list-group">
+            {% for msg in messages %}
+                <li class="list-group-item list-group-item-{{ msg.tags }}">{{ msg|safe }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
 
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="上传" />
-</form>
+<div class="row">
+    <form method="post" enctype="multipart/form-data" class="form-inline col-md-12" role="form">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="form-group">
+                <label class="sr-only">{{ field.label }}</label>
+                {{ field }}
+            </div>
+        {% endfor %}
+        <input type="submit" value="上传" class="btn btn-primary" />
+    </form>
+</div>
 {% endblock %}

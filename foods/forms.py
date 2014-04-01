@@ -8,7 +8,8 @@ class UploadFoodForm(forms.Form):
     """
     Upload food data form.
     """
-    file = forms.FileField()
+    file = forms.FileField(
+        widget=forms.FileInput(attrs={'class': 'form-control'}))
 
     def clean(self):
         """
