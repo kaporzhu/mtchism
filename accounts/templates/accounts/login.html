@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}用户登录{% endblock %}
+
+{% block content %}
+<h3 class="text-center">用户登录</h3>
+<form method="post" class="form-horizontal col-sm-offset-4 col-sm-6" role="form">
+    {% csrf_token %}
+    {% for field in form %}
+        <div class="form-group">
+            <label class="col-sm-2 control-label">{{ field.label }}: </label>
+            <div class="col-sm-5">
+                {{ field }}
+            </div>
+            <span class="label label-danger">{{ field.errors.0 }}</span>
+        </div>
+    {% endfor %}
+
+    {% if form.non_field_errors %}
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <div class="alert alert-danger">{{ form.non_field_errors.0 }}</div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <input class="btn btn-primary" type="submit" value="登录" />
+        </div>
+    </div>
+</form>
+{% endblock %}
