@@ -5,11 +5,13 @@ from django.contrib import messages
 from django.core.urlresolvers import reverse_lazy
 from django.views.generic.edit import FormView
 
+from braces.views._access import SuperuserRequiredMixin
+
 from .forms import UploadFoodForm
 from .models import Category, Food
 
 
-class UploadFoodView(FormView):
+class UploadFoodView(SuperuserRequiredMixin, FormView):
     """
     FormView for uploading food data to the server.
     The food  data should be a JSON file.
