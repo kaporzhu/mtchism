@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django import forms
 from django.contrib import auth
+from django.contrib.auth.models import User
 
 from .mixins import PhoneFormMixin
 
@@ -39,3 +40,12 @@ class RegisterForm(PhoneFormMixin, forms.Form):
     password = forms.CharField(
         label='密码',
         widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+
+    def clean(self):
+        """
+        Check if the user already exist
+        """
+        username = self.data.get('username')
+        if User.objects.filter(username=username).exists():
+            raise forms.ValidationError('手机号已经存在，是不是忘记了密码？')
+        return self.data
