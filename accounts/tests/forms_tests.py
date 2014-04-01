@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from django.contrib.auth.models import User
 from django.test.testcases import TestCase
 
 from .mixins import AccountTestMixin
