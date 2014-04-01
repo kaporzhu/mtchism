@@ -3,7 +3,7 @@
 {% block content %}
 
 {% for msg in messages %}
-    {{ msg }}
+    {{ msg|safe }}
 {% endfor %}
 
 <form method="post" enctype="multipart/form-data">

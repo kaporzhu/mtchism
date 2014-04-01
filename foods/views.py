@@ -78,17 +78,19 @@ class UploadFoodView(FormView):
                     rst['added'] = rst.get('added', 0) + 1
                 else:
                     rst['updated'] = rst.get('updated', 0) + 1
+                result[category.name] = rst
             else:
                 failed_items.append(fd)
 
         # user message
         result_msgs = []
         for cat_name, rst in result.iteritems():
-            msg = '%s(%s): %s added, %s updated'.format(
+            msg = u'{}({}): {} added, {} updated'.format(
                 cat_name, 'Created' if rst['created'] else 'Updated',
-                rst['added'], rst['updated'])
+                rst.get('added', 0), rst.get('updated', 0))
             result_msgs.append(msg)
-        messages.success(self.request, '\n'.join(result_msgs))
-        messages.warning(self.request, json.dumps(failed_items, indent=4))
+        messages.success(self.request, '<br />'.join(result_msgs))
+        if failed_items:
+            messages.warning(self.request, json.dumps(failed_items, indent=4))
 
         return super(UploadFoodView, self).form_valid(form)
