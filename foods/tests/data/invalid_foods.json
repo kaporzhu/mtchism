@@ -1,0 +1,26 @@
+[
+    {
+    },
+    {
+        "name": "food name"
+    },
+    {
+        "category_name": "food category name"
+    },
+    {
+        "cellulose": 0.1
+    },
+    {
+        "name": "food name",
+        "category_name": "food category name"
+    },
+    {
+        "name": "food name",
+        "category_name": "food category name",
+        "heat": "20.1",
+        "carbohydrate": 3.3,
+        "fat": 2.4,
+        "protein": 2.11,
+        "cellulose": 0.1
+    }
+]
