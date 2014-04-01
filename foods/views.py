@@ -63,9 +63,11 @@ class UploadFoodView(SuperuserRequiredMixin, FormView):
         foods = form.cleaned_data['foods']  # JSON data from the uploaded file
         for fd in foods:
             if sorted(fd.keys()) == sorted(self.required_fields):
-                category, cat_created = Category.objects.get_or_create(name=fd['category_name'])  # noqa
+                category, cat_created = Category.objects.get_or_create(
+                    name=fd['category_name'])
                 food, food_created = Food.objects.get_or_create(
-                    name=fd['name'], category = category)
+                    name=fd['name'], category=category)
+
                 food.heat = fd['heat']
                 food.carbohydrate = fd['carbohydrate']
                 food.fat = fd['fat']
