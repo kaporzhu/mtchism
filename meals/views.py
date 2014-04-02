@@ -6,8 +6,8 @@ from braces.views import(
     StaffuserRequiredMixin, SetHeadlineMixin
 )
 
-from .forms import MealForm
-from .models import Meal
+from .forms import MealForm, DishForm
+from .models import Meal, Dish
 from django.views.generic.list import ListView
 
 
@@ -45,3 +45,44 @@ class MealListView(StaffuserRequiredMixin, ListView):
     List view for meals
     """
     model = Meal
+
+
+class CreateDishView(StaffuserRequiredMixin, SetHeadlineMixin, CreateView):
+    """
+    View for create meal
+    """
+    model = Dish
+    form_class = DishForm
+    headline = '新建菜品'
+    success_url = reverse_lazy('meals:list')
+
+    def post(self, request, *args, **kwargs):
+        """
+        Get meal from meal_pk
+        """
+        self.meal = Meal.objects.get(pk=kwargs['meal_pk'])
+        return super(CreateDishView, self).post(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        """
+        Set the meal creator here
+        """
+        # create dish
+        dish = form.save(commit=False)
+        dish.creator = self.request.user
+        dish.save()
+
+        # add to meal
+        self.meal.dishes.add(dish)
+
+        return super(CreateDishView, self).form_valid(form)
+
+
+class UpdateDishView(StaffuserRequiredMixin, SetHeadlineMixin, UpdateView):
+    """
+    View for create meal
+    """
+    model = Dish
+    form_class = DishForm
+    headline = '修改菜名'
+    success_url = reverse_lazy('meals:list')
