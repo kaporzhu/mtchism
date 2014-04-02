@@ -34,6 +34,7 @@ LOCAL_APPS = (
     'foods',
     'meals',
     'mtchism',
+    'orders',
 )
 
 INSTALLED_APPS = (
