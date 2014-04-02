@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
+import json
 import os
 
 from django.contrib.messages.storage.fallback import FallbackStorage
+from django.db.models.query import QuerySet
 from django.test.client import RequestFactory
 from django.test.testcases import TestCase
 
 from foods.forms import UploadFoodForm
 from foods.models import Category, Food
-from foods.views import UploadFoodView
+from foods.views import UploadFoodView, SearchFoodView
 from mtchism.tests.mixins import FormFileMixin
 
 
@@ -45,3 +47,35 @@ class UploadFoodViewTests(FormFileMixin, TestCase):
         view.form_valid(form)
         self.assertTrue(Category.objects.count() == 1)
         self.assertTrue(Food.objects.count() == 1)
+
+
+class SearchFoodViewTests(TestCase):
+    """
+    Tests for SearchFoodView
+    """
+    def test_search(self):
+        """
+        Check if the foods is returned
+        """
+        view = SearchFoodView()
+        self.assertTrue(isinstance(view.search('Test'), QuerySet))
+
+    def _fake_render_json_response(self, context_dict):
+        """
+        Fake render_json_response, return context_dict directly
+        """
+        return context_dict
+
+    def test_get_ajax(self):
+        """
+        Check if the foods is returned in JSON
+        """
+        category, created = Category.objects.get_or_create(name='category')
+        food, created = Food.objects.get_or_create(name='food_ajax',
+                                                   category=category)
+        request = RequestFactory()
+        request.GET = {'term': food.name}
+        view = SearchFoodView()
+        response = view.get_ajax(request)
+        foods = json.loads(response.content)
+        self.assertTrue(len(foods) == 1)

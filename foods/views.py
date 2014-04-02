@@ -9,6 +9,7 @@ from braces.views._access import SuperuserRequiredMixin
 
 from .forms import UploadFoodForm
 from .models import Category, Food
+from braces.views._ajax import AjaxResponseMixin, JSONResponseMixin
 
 
 class UploadFoodView(SuperuserRequiredMixin, FormView):
@@ -100,3 +101,24 @@ class UploadFoodView(SuperuserRequiredMixin, FormView):
             messages.warning(self.request, failed_msg)
 
         return super(UploadFoodView, self).form_valid(form)
+
+
+class SearchFoodView(JSONResponseMixin, AjaxResponseMixin, FormView):
+    """
+    FormView for search food
+    """
+
+    def search(self, keyword):
+        """
+        Search the food here
+        """
+        return Food.objects.filter(name__contains=keyword)[:5]
+
+    def get_ajax(self, request, *args, **kwargs):
+        """
+        Search API for AJAX
+        """
+        keyword = request.GET.get('term')
+        foods = self.search(keyword) if keyword else []
+        foods_json = [{'id': f.id, 'label': f.name, 'value': f.name} for f in foods]  # noqa
+        return self.render_json_response(foods_json)
