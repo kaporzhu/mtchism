@@ -4,47 +4,69 @@
 
 {% block content %}
 
-<div class="row">
-    <table class="table table-striped table-bordered table-hover">
-        <thead>
-            <tr>
-                <th>套餐名</th>
-                <th>菜品</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for meal in object_list %}
-            <tr>
-                <td>
-                    {{ meal.name }}
-                    <a href="{% url 'meals:update' pk=meal.id %}">
-                        <span class="glyphicon glyphicon-pencil"></span>
-                    </a>
-                </td>
-                <td>
-                    <table class="table table-striped table-bordered table-hover">
-                        {% for dish in meal.dishes.all %}
-                        <tr>
-                            <td>
-                                {{ dish.name }}
-                                <a href="{% url 'meals:update_dish' meal_pk=meal.id pk=dish.id %}">
-                                    <span class="glyphicon glyphicon-pencil"></span>
-                                </a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                        <tr>
-                            <td>
-                                <a href="{% url 'meals:create_dish' meal_pk=meal.id %}">
-                                    <span class="glyphicon glyphicon-plus"></span>
-                                </a>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="col-md-12">
+    <div class="row">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>套餐名</th>
+                    <th>菜品</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for meal in object_list %}
+                <tr>
+                    <td>
+                        {{ meal.name }}
+                        <a href="{% url 'meals:update' pk=meal.id %}">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                        </a>
+                    </td>
+                    <td>
+                        <table class="table table-bordered table-hover">
+                            {% for dish in meal.dishes.all %}
+                            <tr>
+                                <td>
+                                    {{ dish.name }}
+                                    <a href="{% url 'meals:update_dish' meal_pk=meal.id pk=dish.id %}">
+                                        <span class="glyphicon glyphicon-pencil"></span>
+                                    </a>
+                                    <a href="{% url 'meals:update_dish_foods' meal_pk=meal.id dish_pk=dish.id %}">
+                                        <span class="glyphicon glyphicon-th-list"></span>
+                                    </a>
+                                </td>
+                                <td>
+                                    <table class="table table-bordered table-hover">
+                                        {% for dishfood in dish.dishfood_set.all %}
+                                        <tr>
+                                            <td>{{ dishfood.food.name }}</td>
+                                            <td>{{ dishfood.weight }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </table>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            <tr>
+                                <td colspan="2">
+                                    <a href="{% url 'meals:create_dish' meal_pk=meal.id %}">
+                                        <span class="glyphicon glyphicon-plus"></span>
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td colspan="2">
+                        <a href="{% url 'meals:create' %}">
+                            <span class="glyphicon glyphicon-plus"></span>
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}

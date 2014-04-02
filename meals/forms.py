@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import json
+
 from django import forms
 
 from .models import Meal, Dish
@@ -28,3 +30,19 @@ class DishForm(forms.ModelForm):
             'name': forms.TextInput(attrs={'class': 'form-control',
                                            'placeholder': '菜名'})
         }
+
+class UpdateDishFoodsForm(forms.Form):
+    """
+    Form for update dish foods
+    """
+    foods = forms.CharField(widget=forms.HiddenInput)
+
+    def clean_foods(self):
+        """
+        Convert the foods string to JSON
+        """
+        try:
+            foods = json.loads(self.data.get('foods'))
+            return foods
+        except:
+            raise forms.ValidationError('Invalid foods data')
