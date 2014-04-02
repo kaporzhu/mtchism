@@ -15,7 +15,7 @@ class Dish(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
-class DishFoods(models.Model):
+class DishFood(models.Model):
     """
     Foods in a dish
     """
