@@ -8,7 +8,8 @@ import mock
 from foods.models import Food, Category
 from meals.forms import MealForm, DishForm, UpdateDishFoodsForm
 from meals.models import Meal, Dish, DishFood
-from meals.views import CreateMealView, CreateDishView, UpdateDishFoodsView
+from meals.views import CreateMealView, CreateDishView, UpdateDishFoodsView,\
+    MealIndexView
 
 
 class CreateMealViewTests(TestCase):
@@ -185,3 +186,24 @@ class UpdateDishFoodsViewTests(TestCase):
         form.cleaned_data = {'foods': []}
         view.form_valid(form)
         self.assertFalse(DishFood.objects.exists())
+
+
+class MealIndexViewTests(TestCase):
+    """
+    Tests for MealIndexView
+    """
+    def _fake_get_context_data(self, **kwargs):
+        """
+        Fake get_context_data, return empty dict directly
+        """
+        return {}
+
+    @mock.patch('django.views.generic.base.TemplateView.get_context_data',
+                _fake_get_context_data)
+    def test_get_context_data(self):
+        """
+        Check if the meals is added to the context
+        """
+        view = MealIndexView()
+        data = view.get_context_data()
+        self.assertTrue('meals' in data)

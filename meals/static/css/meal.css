@@ -1,0 +1,17 @@
+.add-to-cart {
+    float: right;
+    cursor: pointer;
+    color: #428bca;
+}
+
+.add-to-cart:hover {
+    color: #2a6496;
+}
+
+#meals .list-group-item {
+    cursor: pointer;
+}
+
+.remove-selected-meal {
+    float: right;
+}
