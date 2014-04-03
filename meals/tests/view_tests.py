@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
-from django.contrib.auth.models import User
 from django.test.client import RequestFactory
 from django.test.testcases import TestCase
 
 import mock
 
-from foods.models import Food, Category
+from .factories import MealFactory, DishFactory
+from accounts.tests.factories import UserFactory
+from foods.tests.factories import FoodFactory
 from meals.forms import MealForm, DishForm, UpdateDishFoodsForm
 from meals.models import Meal, Dish, DishFood
-from meals.views import CreateMealView, CreateDishView, UpdateDishFoodsView,\
-    MealIndexView
+from meals.views import(
+    CreateMealView, CreateDishView, UpdateDishFoodsView, MealIndexView
+)
 
 
 class CreateMealViewTests(TestCase):
@@ -29,7 +31,7 @@ class CreateMealViewTests(TestCase):
         Check if the meal object is created
         """
         # create view
-        user, created = User.objects.get_or_create(username='12345678901')
+        user = UserFactory()
         request = RequestFactory()
         request.user = user
         view = CreateMealView()
@@ -58,8 +60,7 @@ class CreateDishViewTest(TestCase):
         """
         Check if the meal is set to the view
         """
-        user, created = User.objects.get_or_create(username='12345678901')
-        meal, created = Meal.objects.get_or_create(name='meal', creator=user)
+        meal = MealFactory()
         view = CreateDishView()
         view.post(None, meal_pk=meal.id)
         self.assertTrue(view.meal == meal)
@@ -77,10 +78,9 @@ class CreateDishViewTest(TestCase):
         Check if the dish is created and added to the meal
         """
         # create view
-        user, created = User.objects.get_or_create(username='12345678901')
-        meal, created = Meal.objects.get_or_create(name='meal', creator=user)
+        meal = MealFactory()
         request = RequestFactory()
-        request.user = user
+        request.user = meal.creator
         view = CreateDishView()
         view.request = request
         view.meal = meal
@@ -111,9 +111,8 @@ class UpdateDishFoodsViewTests(TestCase):
         Check if the meal and dish are added to the view
         """
         view = UpdateDishFoodsView()
-        user, created = User.objects.get_or_create(username='test')
-        meal, created = Meal.objects.get_or_create(creator=user, name='meal')
-        dish, created = Dish.objects.get_or_create(creator=user, name='dish')
+        meal = MealFactory()
+        dish = DishFactory()
         view.dispatch(None, meal_pk=meal.id, dish_pk=dish.id)
         self.assertTrue(view.meal == meal)
         self.assertTrue(view.dish == dish)
@@ -131,11 +130,8 @@ class UpdateDishFoodsViewTests(TestCase):
         Check if meal and dish are added to the context
         """
         view = UpdateDishFoodsView()
-        user, created = User.objects.get_or_create(username='test')
-        meal, created = Meal.objects.get_or_create(creator=user, name='meal')
-        dish, created = Dish.objects.get_or_create(creator=user, name='dish')
-        view.dish = dish
-        view.meal = meal
+        view.dish = DishFactory()
+        view.meal = MealFactory()
         data = view.get_context_data()
         self.assertTrue('meal' in data)
         self.assertTrue('dish' in data)
@@ -154,14 +150,11 @@ class UpdateDishFoodsViewTests(TestCase):
         2. Update existed dishfood
         3. Remove dishfood
         """
-        category, created = Category.objects.get_or_create(name='category')
-        food, created = Food.objects.get_or_create(name='food',
-                                                   category=category)
-        user, created = User.objects.get_or_create(username='test')
-        dish, created = Dish.objects.get_or_create(creator=user, name='dish')
+        food = FoodFactory()
+        dish = DishFactory()
         form = UpdateDishFoodsForm()
         request = RequestFactory()
-        request.user = user
+        request.user = dish.creator
         view = UpdateDishFoodsView()
         view.dish = dish
         view.request = request
