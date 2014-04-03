@@ -14,6 +14,32 @@ class Dish(models.Model):
     creator = models.ForeignKey(User)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def get_food_elements(self):
+        """
+        Get total nutrient elements
+        """
+        elements = {}
+        total_weight = 0
+        names = ['heat', 'carbohydrate', 'fat', 'protein', 'cellulose']
+        for dishfood in self.dishfood_set.all():
+            total_weight += dishfood.weight
+            for name in names:
+                amount = elements.get(name, 0)
+                food = dishfood.food
+                if getattr(food, name) != -1:
+                    amount += getattr(food, name)/100.0*dishfood.weight
+                    elements[name] = amount
+
+        # add total weight
+        elements['weight'] = total_weight
+
+        # set default value if doesn't exist
+        for name in names:
+            if name not in elements:
+                elements[name] = '-'
+
+        return elements
+
 
 class DishFood(models.Model):
     """
