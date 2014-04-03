@@ -28,7 +28,6 @@ class DishFoodFactory(factory.DjangoModelFactory):
     weight = 100
 
 
-
 class MealFactory(factory.DjangoModelFactory):
     """
     Factory for Meal

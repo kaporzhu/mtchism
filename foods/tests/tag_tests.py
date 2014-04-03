@@ -16,7 +16,6 @@ class FoodTagsTests(TestCase):
         # avoid import circulation
         from meals.tests.factories import DishFactory, DishFoodFactory
 
-
         food = FoodFactory(heat=10)
         dish = DishFactory()
         dishfood = DishFoodFactory(dish=dish, food=food, weight=100)
