@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
+from django.core.urlresolvers import reverse
 from django.views.generic.base import TemplateView
+from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 
 from braces.views import LoginRequiredMixin, JSONResponseMixin
 
-from .constant import CANCELED
 from .forms import CheckoutForm
 from .models import Order, OrderMeal
 from meals.models import Meal
-from django.views.generic.detail import DetailView
-from django.core.urlresolvers import reverse
 
 
 class CheckoutView(LoginRequiredMixin, JSONResponseMixin, FormView):

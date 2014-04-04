@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 from django.db import models
 
 from .constant import CREATED, PAID, DONE, CANCELED
@@ -28,6 +29,20 @@ class Order(models.Model):
 
     class Meta:
         ordering = ('-created_at',)
+
+    def get_operation_buttons(self):
+        """
+        Depends on the order status.
+        If the order isn't paid, the user can cancel or pay.
+        """
+        if self.status == CREATED:
+            cancel_url = '#'
+            cancel_btn = '<a href="{}" class="btn btn-default btn-xs pull-right">取消订单</a>'.format(cancel_url)  # noqa
+            pay_url = '#'
+            pay_btn = '<a href="{}" class="btn btn-primary btn-xs pull-right">马上支付</a>'.format(pay_url)  # noqa
+            return '{}{}'.format(cancel_btn, pay_btn)
+
+        return None
 
 
 class OrderMeal(models.Model):
