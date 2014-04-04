@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block title %}下单成功{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-offset-4 col-md-6">
+        <p>订单创建成功，请及时付款。<a href="{% url 'orders:mine' %}">查看订单</a></p>
+        <p>感谢您的支持 :-)</p>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.core.urlresolvers import reverse_lazy
+from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView, UpdateView, FormView
 from django.views.generic.list import ListView
 
@@ -137,3 +138,18 @@ class UpdateDishFoodsView(StaffuserRequiredMixin, FormView):
         self.dish.dishfood_set.exclude(id__in=new_food_ids).delete()
 
         return super(UpdateDishFoodsView, self).form_valid(form)
+
+
+class MealIndexView(TemplateView):
+    """
+    View for display all the meals
+    """
+    template_name = 'meals/index.html'
+
+    def get_context_data(self, **kwargs):
+        """
+        Add extra data to context
+        """
+        data = super(MealIndexView, self).get_context_data(**kwargs)
+        data.update({'meals': Meal.objects.all()})
+        return data

@@ -3,12 +3,14 @@ from django.conf.urls import patterns, url
 
 from .views import(
     CreateMealView, UpdateMealView, MealListView,
-    CreateDishView, UpdateDishView, UpdateDishFoodsView
+    CreateDishView, UpdateDishView, UpdateDishFoodsView, MealIndexView
 )
 
 
 urlpatterns = patterns(
     '',
+    url(r'^$', MealIndexView.as_view(), name='index'),
+
     # meal
     url(r'^create/$', CreateMealView.as_view(), name='create'),
     url(r'^update/(?P<pk>\d+)/$', UpdateMealView.as_view(), name='update'),

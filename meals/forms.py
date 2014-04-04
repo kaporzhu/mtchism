@@ -31,6 +31,7 @@ class DishForm(forms.ModelForm):
                                            'placeholder': '菜名'})
         }
 
+
 class UpdateDishFoodsForm(forms.Form):
     """
     Form for update dish foods

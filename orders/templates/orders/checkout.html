@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block title %}结算{% endblock %}
+
+{% block extracss %}
+<link rel="stylesheet" href="{% static 'css/order.css' %}">
+{% endblock %}
+
+{% block extrajs %}
+<script src="{% static 'js/meal_storage.js' %}"></script>
+<script src="{% static 'js/order.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+
+    <div class="col-md-12">
+        <form class="form-inline" role="form">
+            <div class="form-group">
+                <span>配送地址：</span>
+                <select id="building" class="form-control input-sm">
+                    <option>百脑汇</option>
+                    <option>EAC(欧美中心)</option>
+                </select>
+                <input type="text" id="location" class="form-control input-sm" placeholder="请尽可能详细。如A座三单元1005-2 B区02" />
+            </div>
+        </form>
+        <hr />
+    </div>
+    <div class="col-md-12" id="selected_meals">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th class="col-md-8">套餐名</th>
+                    <th>单价</th>
+                    <th>数量</th>
+                    <th>小计</th>
+                </tr>
+            </thead>
+            <tbody id="selected-meals">
+            </tbody>
+        </table>
+        {% verbatim %}
+        <script id='selected-meal-template' type='text/ractive'>
+            {{#meals}}
+            <tr>
+                <td>{{name}}</td>
+                <td>{{price}}</td>
+                <td>
+                    <span>{{amount}}</span>
+                    <div class="pull-right">
+                        <a href="javascript:void(0)" data-id="{{id}}" class="plus-meal"><span class="glyphicon glyphicon-plus"></span></a>
+                        <a href="javascript:void(0)" data-id="{{id}}" class="minus-meal"><span class="glyphicon glyphicon-minus"></span></a>
+                    </div>
+                </td>
+                <td>{{subtotal}}</td>
+            </tr>
+            {{/meals}}
+            {{#total}}
+            <tr class="text-right">
+                <td colspan=4>您一共选择了<b>{{amount}}</b>份套餐，总计<b>{{price}}</b>元</td>
+            </tr>
+            {{/total}}
+        </script>
+        {% endverbatim %}
+    </div>
+
+    <form method="post" class="form-inline col-md-12 text-right" role="form">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="form-group">
+                <label class="sr-only">{{ field.label }}</label>
+                {{ field }}
+            </div>
+        {% endfor %}
+        <a id="back-to-meals-btn" href="{% url 'meals:index' %}">返回继续添加</a>&nbsp;
+        <button type="button" data-loading-text="正在创建订单..." id="create-order-btn" type="button" class="btn btn-primary">下单</button>
+    </form>
+</div>
+{% endblock %}

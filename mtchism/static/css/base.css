@@ -1,0 +1,91 @@
+body {
+    font: 14px "微软雅黑", "MicrosoftYahei", "宋体", "Arial Narrow", HELVETICA;
+    background-image: url("../image/bg.png");
+}
+
+#body {
+    background: #fff;
+    box-shadow: 0 0 1px 0px rgba(0, 0, 0, 0.2), 0 0 50px 10px rgba(255, 255, 255, 0.5);
+    padding-bottom: 30px;
+}
+
+#footer {
+    margin-top: 50px;
+}
+
+#header .dropdown:hover .dropdown-menu {
+    display: block;
+}
+
+#header .navbar {
+    background: #fff;
+    background-image: none;
+    border-color: #EEEEEE;
+    border-left: medium none #EEEEEE;
+    border-right: medium none #EEEEEE;
+    border-style: solid none;
+    border-width: 1px medium;
+    font-family: 'Open Sans Condensed', sans-serif;
+    border-radius: 0px;
+    box-shadow: none;
+    padding: 0px;
+    z-index: 10000;
+}
+
+#header .navbar li {
+    padding: 5px 7px 5px 20px;
+}
+
+#header .navbar li:hover, #header .navbar li a:hover {
+    background-color: #A8CBEC;
+}
+
+#header .navbar .open a:focus {
+    background-color: #A8CBEC;
+}
+
+#header .dropdown-menu {
+    background: #949494;
+    background: rgba(148, 148, 148, 0.9);
+    padding: 10px;
+    border-radius: 0px;
+    box-shadow: none;
+    border: none;
+    z-index: 10000;
+}
+
+#header .dropdown-menu li > a, #header .dropdown-menu li > a:focus, #header .dropdown-menu li > a:hover {
+    color: #fff;
+    background: transparent;
+    font-size: 12px;
+    line-height: 26px;
+    font-weight: 600;
+    padding: 5px 15px;
+}
+
+#header .dropdown-menu li > a:hover {
+    color: #80766F;
+}
+
+#header .dropdown-menu li:hover {
+    background-color: #fff;
+}
+
+#header .top-header {
+    padding-top: 60px;
+    padding-bottom: 45px;
+    background: #fff;
+    padding: 0px 30px 30px;
+    padding-left: 0px;
+}
+
+#header .top-header .logo {
+    padding: 60px 30px 30px 25px;
+}
+
+#header .top-header a {
+    color: #80766F;
+    font-size: 32px;
+    line-height: 32px;
+    text-decoration: none;
+}

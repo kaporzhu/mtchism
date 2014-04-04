@@ -1,4 +1,10 @@
+Django==1.6.2
 Fabric==1.8.3
+South==0.8.4
 coverage==3.7.1
+django-braces==1.4.0
+factory-boy==2.3.1
 flake8==2.1.0
 ipdb==0.8
+mock==1.0.1
+mysql-python==1.2.4c1

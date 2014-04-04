@@ -24,15 +24,17 @@ $(document).ready(function(){
     });
 
     // bind autocomplete for the food name field
-    $('#food-name').autocomplete({
-      source: $('#food-name').data('ajax-url'),
-      minLength: 1,
-      select: function(event, ui) {
-          $('#food-id').val(ui.item.id);
-      }
-    });
+    if ($('#food-name').size()) {
+        $('#food-name').autocomplete({
+          source: $('#food-name').data('ajax-url'),
+          minLength: 1,
+          select: function(event, ui) {
+              $('#food-id').val(ui.item.id);
+          }
+        });
+    }
 
-    // update dish foods info in the hidden field
+    // update dish foods info in the hidden field 
     function update_dish_foods() {
         var foods = [];
         $('#dish-foods li').each(function(){
@@ -45,4 +47,59 @@ $(document).ready(function(){
         $('#id_foods').val(JSON.stringify(foods));
     }
     update_dish_foods();
+
+    // toggle meal details in the meal index page
+    $('.list-group-item').click(function(){
+        $(this).children('.details').toggleClass('hidden');
+        $(this).children('.dishes').toggleClass('hidden');
+    });
+
+    // add to cart
+    $('.add-to-cart').click(function(event){
+        var id = $(this).data('id');
+        var name = $(this).data('name');
+        var price = parseFloat( $(this).data('price'));
+        add_meal(id, name, price);
+        load_meals();
+        return false;
+    });
+
+    $(document).on('click', '.delete-meal', function(){
+        var id = $(this).parents('li').data('id');
+        delete_meal(id);
+        load_meals();
+    });
+    $(document).on('click', '.minus-meal', function(){
+        var id = $(this).parents('li').data('id');
+        var amount = minus_meal(id);
+        if (amount == 0) {
+            delete_meal(id);
+            $(this).parents('li').remove();
+        }
+        load_meals();
+    });
+    $(document).on('click', '.plus-meal', function(){
+        var id = $(this).parents('li').data('id');
+        plus_meal(id);
+        load_meals();
+    });
+
+    // load selected meals from localStorage
+    function load_meals() {
+        var meals = get_meals();
+        var checkout_url = $('#selected-meals').data('checkout-url');
+        meals['checkout_url'] = checkout_url;
+        $('#selected-meals li').remove();
+        if (meals.meals.length > 0){
+            $('#selected-meals').removeClass('hidden');
+        } else {
+            $('#selected-meals').addClass('hidden');
+        }
+        var ractive = new Ractive({
+            el: '#selected-meals',
+            template: '#selected-meal-template',
+            data: meals
+        });
+    }
+    load_meals();
 });

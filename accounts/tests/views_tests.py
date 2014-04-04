@@ -3,6 +3,7 @@ from django.contrib import auth
 from django.contrib.auth.models import User
 from django.test.testcases import TestCase
 
+from .factories import UserFactory
 from .mixins import AccountTestMixin
 from accounts.forms import LoginForm, RegisterForm
 from accounts.views import LoginView, LogoutView, RegisterView
@@ -17,7 +18,9 @@ class LoginViewTests(AccountTestMixin, TestCase):
         Check if the user is authenticated.
         """
         # add test User account
-        self.create_user('test', '123')
+        user = UserFactory()
+        user.set_password('123')
+        user.save()
 
         # create LoginView
         view = LoginView()
@@ -25,13 +28,13 @@ class LoginViewTests(AccountTestMixin, TestCase):
 
         # create LoginForm
         form = LoginForm()
-        form.data = {'username': 'test',
+        form.data = {'username': user.username,
                      'password': '123'}
         form.cleaned_data = form.clean()
 
         # test now
         view.form_valid(form)
-        self.assertEqual(view.request.user.username, 'test')
+        self.assertEqual(view.request.user.username, user.username)
         self.assertTrue(view.request.user.is_authenticated())
 
 
@@ -45,14 +48,16 @@ class LogoutViewTests(AccountTestMixin, TestCase):
         Check if authenticated user is logged out
         """
         # create test User account
-        self.create_user('test', '123')
+        user = UserFactory()
+        user.set_password('123')
+        user.save()
 
         # create LogoutView
         view = LogoutView()
         view.request = self.generate_request()
 
         # test now
-        user = auth.authenticate(username='test', password='123')
+        user = auth.authenticate(username=user.username, password='123')
         auth.login(view.request, user)
         self.assertTrue(view.request.user.is_authenticated())
         view.get(view.request)

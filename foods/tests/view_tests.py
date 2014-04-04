@@ -7,6 +7,7 @@ from django.db.models.query import QuerySet
 from django.test.client import RequestFactory
 from django.test.testcases import TestCase
 
+from .factories import FoodFactory
 from foods.forms import UploadFoodForm
 from foods.models import Category, Food
 from foods.views import UploadFoodView, SearchFoodView
@@ -70,9 +71,7 @@ class SearchFoodViewTests(TestCase):
         """
         Check if the foods is returned in JSON
         """
-        category, created = Category.objects.get_or_create(name='category')
-        food, created = Food.objects.get_or_create(name='food_ajax',
-                                                   category=category)
+        food = FoodFactory()
         request = RequestFactory()
         request.GET = {'term': food.name}
         view = SearchFoodView()
