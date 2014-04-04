@@ -84,7 +84,7 @@ class CancelOrderView(LoginRequiredMixin, RedirectView):
         """
         Cancel order here
         """
-        order = Order.objects.get(pk=kwargs['pk'])
+        order = Order.objects.get(pk=kwargs['pk'], creator=self.request.user)
         order.status = CANCELED
         order.save()
         return redirect(reverse('orders:mine'))
