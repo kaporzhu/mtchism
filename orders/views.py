@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 from django.core.urlresolvers import reverse
-from django.views.generic.base import TemplateView
+from django.shortcuts import redirect
+from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 
 from braces.views import LoginRequiredMixin, JSONResponseMixin
 
+from .constant import CANCELED
 from .forms import CheckoutForm
 from .models import Order, OrderMeal
 from meals.models import Meal
@@ -70,3 +72,19 @@ class CreateSuccessView(LoginRequiredMixin, DetailView):
     """
     model = Order
     template_name = 'orders/success.html'
+
+
+class CancelOrderView(LoginRequiredMixin, RedirectView):
+    """
+    View for cancel Order
+    """
+    permanent = False
+
+    def get(self, request, *args, **kwargs):
+        """
+        Cancel order here
+        """
+        order = Order.objects.get(pk=kwargs['pk'])
+        order.status = CANCELED
+        order.save()
+        return redirect(reverse('orders:mine'))

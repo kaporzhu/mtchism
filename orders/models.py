@@ -36,10 +36,14 @@ class Order(models.Model):
         If the order isn't paid, the user can cancel or pay.
         """
         if self.status == CREATED:
-            cancel_url = '#'
-            cancel_btn = '<a href="{}" class="btn btn-default btn-xs pull-right">取消订单</a>'.format(cancel_url)  # noqa
+            cancel_url = reverse('orders:cancel', kwargs={'pk': self.id})
+            cancel_btn = '<a href="javascript:void(0)" data-url="{}" '\
+                         'data-message="确定要取消？" class="confirm btn '\
+                         'btn-default btn-xs pull-right">'\
+                         '取消订单</a>'.format(cancel_url)
             pay_url = '#'
-            pay_btn = '<a href="{}" class="btn btn-primary btn-xs pull-right">马上支付</a>'.format(pay_url)  # noqa
+            pay_btn = '<a href="{}" class="btn btn-primary btn-xs '\
+                      'pull-right">马上支付</a>'.format(pay_url)
             return '{}{}'.format(cancel_btn, pay_btn)
 
         return None

@@ -13,3 +13,12 @@ function get_cookie(name) {
     }
     return cookieValue;
 }
+
+$(document).ready(function(){
+    // confirm for tag a. Alert confirm message in data-message. If yes, go to the url in data-url.
+    $('a.confirm').click(function(){
+        if(confirm($(this).data('message'))) {
+            window.location.href = $(this).data('url');
+        }
+    });
+});
