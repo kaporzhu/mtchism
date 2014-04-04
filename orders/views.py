@@ -8,6 +8,8 @@ from .constant import CANCELED
 from .forms import CheckoutForm
 from .models import Order, OrderMeal
 from meals.models import Meal
+from django.views.generic.detail import DetailView
+from django.core.urlresolvers import reverse
 
 
 class CheckoutView(LoginRequiredMixin, JSONResponseMixin, FormView):
@@ -42,7 +44,8 @@ class CheckoutView(LoginRequiredMixin, JSONResponseMixin, FormView):
         order.save()
 
         # return ajax response here
-        context = {'success': True, 'success_url': '/'}
+        success_url = reverse('orders:success', kwargs={'pk': order.id})
+        context = {'success': True, 'success_url': success_url}
         return self.render_json_response(context)
 
 
@@ -60,3 +63,11 @@ class MyOrderView(LoginRequiredMixin, TemplateView):
         orders = Order.objects.filter(creator=self.request.user)
         data.update({'orders': orders})
         return data
+
+
+class CreateSuccessView(LoginRequiredMixin, DetailView):
+    """
+    Order create success page
+    """
+    model = Order
+    template_name = 'orders/success.html'
