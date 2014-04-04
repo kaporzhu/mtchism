@@ -8,6 +8,7 @@
 {% endblock %}
 
 {% block extrajs %}
+<script src="{% static 'js/meal_storage.js' %}"></script>
 <script src="{% static 'js/meal.js' %}"></script>
 {% endblock %}
 
@@ -20,7 +21,9 @@
             <span class="list-group-item">
                 <h4 class="list-group-item-heading">
                     <span class="meal-name">{{ meal.name }}</span>
-                    <span class="glyphicon glyphicon-shopping-cart add-to-cart" data-id="{{ meal.id }}" data-name="{{ meal.name }}" data-price="1.5"></span>
+                    <a href="javascript:void(0)" class="add-to-cart pull-right" data-id="{{ meal.id }}" data-name="{{ meal.name }}" data-price="1.5">
+                        <span class="glyphicon glyphicon-shopping-cart"></span>
+                    </a>
                 </h4>
                 <p class="list-group-item-text dishes">
                     {% for dish in meal.dishes.all %}
@@ -86,15 +89,36 @@
         </div>
     </div>
     <div class="col-md-4">
-        <ul class="list-group hidden" id="selected-meals">
-            <li class="list-group-item last text-right">
-                <span>费用: </span>
-                <b class="total"></b>
-            </li>
-            <li class="list-group-item checkout text-right">
-                <a href="#">选好了</a>
-            </li>
+        <ul class="list-group hidden" id="selected-meals" data-checkout-url="{% url 'orders:checkout' %}">
         </ul>
+        {% verbatim %}
+        <script id='selected-meal-template' type='text/ractive'>
+            {{#meals}}
+            <li class="list-group-item meal" data-id="{{id}}">
+                <b class="name">{{name}}</b> x <span class="amount">{{amount}}</span> = <span class="subtotal">{{subtotal}}</span>
+                <div class="btn-group pull-right">
+                    <button type="button" class="btn btn-default btn-xs plus-meal">
+                        <span class="glyphicon glyphicon-plus"></span>
+                    </button>
+                    <button type="button" class="btn btn-default btn-xs minus-meal">
+                        <span class="glyphicon glyphicon-minus"></span>
+                    </button>
+                    <button type="button" class="btn btn-default btn-xs delete-meal">
+                        <span class="glyphicon glyphicon-remove"></span>
+                    </button>
+                </div>
+            </li>
+            {{/meals}}
+            {{#total}}
+            <li class="list-group-item last text-right">
+                <span>您一共选择了<b>{{amount}}</b>份套餐，总计<b>{{price}}</b>元</span>
+            </li>
+            {{/total}}
+            <li class="list-group-item checkout text-right">
+                <a href="{{checkout_url}}">选好了</a>
+            </li>
+        </script>
+        {% endverbatim %}
     </div>
 </div>
 {% endblock %}

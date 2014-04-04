@@ -34,7 +34,7 @@ $(document).ready(function(){
         });
     }
 
-    // update dish foods info in the hidden field
+    // update dish foods info in the hidden field 
     function update_dish_foods() {
         var foods = [];
         $('#dish-foods li').each(function(){
@@ -56,44 +56,50 @@ $(document).ready(function(){
 
     // add to cart
     $('.add-to-cart').click(function(event){
-        $('#selected-meals').removeClass('hidden');
         var id = $(this).data('id');
         var name = $(this).data('name');
         var price = parseFloat( $(this).data('price'));
-
-        // check if the meal is in the cart
-        if ($('#meal_'+id).size()) {
-            var $meal_item = $('#meal_'+id);
-            var amount = parseInt($meal_item.find('.amount').text());
-            $meal_item.find('.amount').text(amount+1);
-            $meal_item.find('.subtotal').text((amount+1)*price);
-        } else {
-            var item_tmpl =
-                '<li class="list-group-item meal" id="meal_{id}">' +
-                    '<b>{name}</b> x <span class="amount">1</span> = <span class="subtotal">{subtotal}</span>' +
-                    '<a href="javascript:void(0)" class="remove-selected-meal">x</a>' +
-                '</li>';
-            $('#selected-meals .last').before(item_tmpl.replace(/{name}/g, $(this).data('name')).replace(/{id}/g, $(this).data('id')).replace(/{subtotal}/g, price));
-        }
-        update_total_price();
+        add_meal(id, name, price);
+        load_meals();
         return false;
     });
 
-    $(document).on('click', '.remove-selected-meal', function(){
-        $(this).parents('li').remove();
-        update_total_price();
-        if ($('#selected-meals .meal').size() == 0) {
-            $('#selected-meals').addClass('hidden');
+    $(document).on('click', '.delete-meal', function(){
+        var id = $(this).parents('li').data('id');
+        delete_meal(id);
+        load_meals();
+    });
+    $(document).on('click', '.minus-meal', function(){
+        var id = $(this).parents('li').data('id');
+        var amount = minus_meal(id);
+        if (amount == 0) {
+            delete_meal(id);
+            $(this).parents('li').remove();
         }
+        load_meals();
+    });
+    $(document).on('click', '.plus-meal', function(){
+        var id = $(this).parents('li').data('id');
+        plus_meal(id);
+        load_meals();
     });
 
-    // update total price in the shopping cart
-    function update_total_price() {
-        var total = 0;
-        $('#selected-meals').children('.meal').each(function(){
-            total += parseFloat($(this).find('.subtotal').text());
+    // load selected meals from localStorage
+    function load_meals() {
+        var meals = get_meals();
+        var checkout_url = $('#selected-meals').data('checkout-url');
+        meals['checkout_url'] = checkout_url;
+        $('#selected-meals li').remove();
+        if (meals.meals.length > 0){
+            $('#selected-meals').removeClass('hidden');
+        } else {
+            $('#selected-meals').addClass('hidden');
+        }
+        var ractive = new Ractive({
+            el: '#selected-meals',
+            template: '#selected-meal-template',
+            data: meals
         });
-        $('#selected-meals .total').text(total);
     }
-
+    load_meals();
 });

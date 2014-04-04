@@ -4,6 +4,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <title>{% block title %}{% endblock %}</title>
 
         <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
@@ -19,7 +20,10 @@
         <div id="footer" class="container">{% include "footer.html" %}</div>
 
         <script src="{% static 'jquery/jquery-1.11.0.min.js' %}"></script>
+        <script src="{% static 'js/base.js' %}"></script>
         <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+        <script src="{% static 'reactive/Ractive-legacy.min.js' %}"></script>
+        <script src="{% static 'respond/respond.js' %}"></script>
         {% block extrajs %}{% endblock %}
     </body>
 </html>
