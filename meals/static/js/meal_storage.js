@@ -104,3 +104,8 @@ function get_meals() {
         }
     };
 }
+
+// clear the meals in the localStorage
+function clear_meals() {
+    localStorage.meals = JSON.stringify([]);
+}

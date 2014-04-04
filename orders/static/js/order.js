@@ -57,6 +57,7 @@ $(document).ready(function(){
                 csrfmiddlewaretoken: get_cookie('csrftoken')
             },
             success: function(result) {
+                clear_meals();
                 btn.button('reset');
                 window.location.href = result.success_url;
             }

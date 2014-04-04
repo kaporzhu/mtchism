@@ -26,6 +26,9 @@
               <li>
                   <a class="navbar-brand" href="{% url 'meals:index' %}">订餐</a>
               </li>
+              <li>
+                  <a class="navbar-brand" href="{% url 'orders:mine' %}">我的订单</a>
+              </li>
           </ul>
           <ul class="nav navbar-nav">
             {% if user.is_authenticated %}

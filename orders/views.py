@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
+from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 
 from braces.views import LoginRequiredMixin, JSONResponseMixin
 
+from .constant import CANCELED
 from .forms import CheckoutForm
 from .models import Order, OrderMeal
 from meals.models import Meal
@@ -42,3 +44,19 @@ class CheckoutView(LoginRequiredMixin, JSONResponseMixin, FormView):
         # return ajax response here
         context = {'success': True, 'success_url': '/'}
         return self.render_json_response(context)
+
+
+class MyOrderView(LoginRequiredMixin, TemplateView):
+    """
+    View for display all my orders
+    """
+    template_name = 'orders/mine.html'
+
+    def get_context_data(self, **kwargs):
+        """
+        Add my orders to the context
+        """
+        data = super(MyOrderView, self).get_context_data(**kwargs)
+        orders = Order.objects.filter(creator=self.request.user)
+        data.update({'orders': orders})
+        return data

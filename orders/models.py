@@ -12,10 +12,10 @@ class Order(models.Model):
     """
 
     STATUS_CHOICES = (
-        (CREATED, 'created'),
-        (PAID, 'paid'),
-        (DONE, 'done'),
-        (CANCELED, 'canceled'),
+        (CREATED, '等待付款'),
+        (PAID, '等待配送'),
+        (DONE, '已完成'),
+        (CANCELED, '已取消'),
     )
 
     status = models.CharField(max_length=16, choices=STATUS_CHOICES,
@@ -25,6 +25,9 @@ class Order(models.Model):
     address = models.CharField(max_length=256, blank=True)
     creator = models.ForeignKey(User)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ('-created_at',)
 
 
 class OrderMeal(models.Model):
