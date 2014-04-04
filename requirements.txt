@@ -1,3 +1,4 @@
 Django==1.6.2
 mysql-python==1.2.4c1
 South==0.8.4
+django-braces==1.4.0
