@@ -29,7 +29,6 @@ body {
     border-radius: 0px;
     box-shadow: none;
     padding: 0px;
-    z-index: 10000;
 }
 
 #header .navbar li {
@@ -51,7 +50,6 @@ body {
     border-radius: 0px;
     box-shadow: none;
     border: none;
-    z-index: 10000;
 }
 
 #header .dropdown-menu li > a, #header .dropdown-menu li > a:focus, #header .dropdown-menu li > a:hover {

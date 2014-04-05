@@ -5,11 +5,12 @@ from django.contrib import messages
 from django.core.urlresolvers import reverse_lazy
 from django.views.generic.edit import FormView
 
-from braces.views._access import SuperuserRequiredMixin
+from braces.views import(
+    SuperuserRequiredMixin, AjaxResponseMixin, JSONResponseMixin
+)
 
 from .forms import UploadFoodForm
 from .models import Category, Food
-from braces.views._ajax import AjaxResponseMixin, JSONResponseMixin
 
 
 class UploadFoodView(SuperuserRequiredMixin, FormView):

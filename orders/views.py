@@ -1,11 +1,17 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
+
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 from django.shortcuts import redirect
 from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
+from django.views.generic.list import ListView
 
-from braces.views import LoginRequiredMixin, JSONResponseMixin
+from braces.views import(
+    LoginRequiredMixin, JSONResponseMixin, StaffuserRequiredMixin
+)
 
 from .constant import CANCELED
 from .forms import CheckoutForm
@@ -88,3 +94,75 @@ class CancelOrderView(LoginRequiredMixin, RedirectView):
         order.status = CANCELED
         order.save()
         return redirect(reverse('orders:mine'))
+
+
+class OrderListView(StaffuserRequiredMixin, ListView):
+    """
+    Display all the orders for the staff
+    """
+    model = Order
+
+    def get_params_from_request(self):
+        """
+        Check all params and return as dict
+        """
+        # status
+        status = self.request.GET.get('status', 'all')
+
+        # address
+        building = self.request.GET.get('building', 'all')
+        location = self.request.GET.get('location')
+
+        # created time
+        try:
+            created_start = self.request.GET.get('created-start-datetime')
+            created_start_dt = datetime.strptime(created_start,
+                                                 '%m/%d/%Y %H:%M')
+        except:
+            created_start_dt = None
+        try:
+            created_end = self.request.GET.get('created-end-datetime')
+            created_end_dt = datetime.strptime(created_end, '%m/%d/%Y %H:%M')
+        except:
+            created_end_dt = None
+
+        return {'status': status, 'building': building, 'location': location,
+                'created_start_dt': created_start_dt,
+                'created_end_dt': created_end_dt}
+
+    def get_queryset(self):
+        """
+        Display the orders depends on the filters
+        """
+        qs = super(OrderListView, self).get_queryset()
+        params = self.get_params_from_request()
+
+        # status
+        status = params['status']
+        status_Q = Q(status=status) if status != 'all' else Q()
+
+        # address
+        address = u'{},{}'.format(params['building'], params['location'])
+        address_Q = Q(address__contains=address) if address != 'all,' else Q()
+
+        # created time
+        start_dt = params['created_start_dt']
+        end_dt = params['created_end_dt']
+        created_time_Q = Q()
+        if start_dt and end_dt:
+            created_time_Q = Q(created_at__range=(start_dt, end_dt))
+        elif start_dt:
+            created_time_Q = Q(created_at__gte=start_dt)
+        elif end_dt:
+            created_time_Q = Q(created_at__lte=end_dt)
+
+        return qs.filter(status_Q, address_Q, created_time_Q)
+
+    def get_context_data(self, **kwargs):
+        """
+        Add extra data to context
+        """
+        data = super(OrderListView, self).get_context_data(**kwargs)
+        data.update({'status_choices': Order.STATUS_CHOICES})
+        data.update(self.get_params_from_request())
+        return data
