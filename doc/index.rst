@@ -9,8 +9,19 @@ Welcome to mtCHIsm's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+    :hidden:
 
+    release_notes
+
+:doc:`release notes </release_notes>`
+
+Contents:
+---------
+
+.. toctree::
+    :maxdepth: 2
+
+    Usage/0_title
 
 
 Indices and tables
