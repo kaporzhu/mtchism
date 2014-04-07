@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block title %}订单管理{% endblock %}
+
+{% block extracss %}
+<link rel="stylesheet" href="{% static 'jquery-ui/css/ui-lightness/jquery-ui-1.10.4.custom.min.css' %}">
+<link rel="stylesheet" href="{% static 'jquery-ui/css/ui-lightness/jquery-ui-timepicker-addon.css' %}">
+{% endblock %}
+
+{% block extrajs %}
+<script src="{% static 'jquery-ui/js/jquery-ui-1.10.4.custom.min.js' %}"></script>
+<script src="{% static 'jquery-ui/js/jquery-ui-timepicker-addon.js' %}"></script>
+<script src="{% static 'js/order-admin.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-12">
+        <form class="form-inline" role="form">
+            <div class="form-group">
+                <span>订单状态：</span>
+                <select name="status" class="form-control">
+                    <option value="all">所有状态</option>
+                    {% for choice in status_choices %}
+                        {% if choice.0 == status %}
+                        <option value="{{ choice.0 }}" selected="selected">{{ choice.1 }}</option>
+                        {% else %}
+                        <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+            <br /><br />
+            <div class="form-group">
+                <span>写字楼：&nbsp;&nbsp;&nbsp;</span>
+                <select name="building" class="form-control">
+                    <option value="all" selected="selected">所有写字楼</option>
+                    <option>百脑汇</option>
+                    <option>EAC(欧美中心)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <input type="text" name="location" class="form-control" value="{{ location|default_if_none:'' }}" placeholder="具体地址" />
+            </div>
+            <br /><br />
+            <div class="form-group">
+                <span>创建时间：</span>
+                <input type="text" class="form-control datetime" value="{{ created_start_dt|date:'m/d/Y H:i' }}" name="created-start-datetime" />
+                <label> - </label>
+                <input type="text" class="form-control datetime" value="{{ created_end_dt|date:'m/d/Y H:i' }}" name="created-end-datetime" />
+            </div>
+            <br /><br />
+            <div class="form-group">
+                <span>配送时间：</span>
+                <input type="text" class="form-control datetime" name="deliver-start-datetime" />
+                <label> - </label>
+                <input type="text" class="form-control datetime" name="deliver-end-datetime" />
+            </div>
+            <br /><br />
+            <button type="submit" class="btn btn-primary">查找</button>
+        </form>
+        <hr />
+    </div>
+    <div class="col-md-12">
+        <div class="btn-group">
+            <div class="btn-group">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">选取
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="javascript:void(0)" data-type="all" class="select-rows-btn">全选</a></li>
+                    <li><a href="javascript:void(0)" data-type="none" class="select-rows-btn">全不选</a></li>
+                    <li><a href="javascript:void(0)" data-type="invert" class="select-rows-btn">反选</a></li>
+                </ul>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                    <span>标记为</span>
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" data-update-status-url="{% url 'orders:update_status' %}">
+                    {% for choice in status_choices %}
+                    <li><a href="javascript:void(0)" data-status="{{ choice.0 }}" class="update-status-btn">{{ choice.1 }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <br /><br />
+        <table id="orders" class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>选取</th>
+                    <th>套餐</th>
+                    <th>数量(份)</th>
+                    <th>下单时间</th>
+                    <th>总价</th>
+                    <th>配送地址</th>
+                    <th>状态</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in object_list %}
+                <tr>
+                    <td>
+                        <input type="checkbox" class="select-row-btn" data-id="{{ order.id }}" />
+                    </td>
+                    <td>
+                        <ul class="list-unstyled">
+                            {% for ordermeal in order.ordermeal_set.all %}
+                            <li>{{ ordermeal.meal.name }} x {{ ordermeal.amount }}</li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                    <td>{{ order.total_amount }}</td>
+                    <td>{{ order.created_at|date:"n月j日" }}</td>
+                    <td>{{ order.total_price }}</td>
+                    <td>{{ order.address }}</td>
+                    <td class="status">
+                        {{ order.get_status_display }}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center">暂时还没有订单</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

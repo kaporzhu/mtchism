@@ -3,6 +3,14 @@ body {
     background-image: url("../image/bg.png");
 }
 
+table tr.selected td {
+    background-color: #FFFFCC;
+}
+
+.highlight {
+    background-color: yellow;
+}
+
 #body {
     background: #fff;
     box-shadow: 0 0 1px 0px rgba(0, 0, 0, 0.2), 0 0 50px 10px rgba(255, 255, 255, 0.5);
@@ -29,7 +37,6 @@ body {
     border-radius: 0px;
     box-shadow: none;
     padding: 0px;
-    z-index: 10000;
 }
 
 #header .navbar li {
@@ -51,7 +58,6 @@ body {
     border-radius: 0px;
     box-shadow: none;
     border: none;
-    z-index: 10000;
 }
 
 #header .dropdown-menu li > a, #header .dropdown-menu li > a:focus, #header .dropdown-menu li > a:hover {
