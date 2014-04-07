@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.core.urlresolvers import reverse_lazy
+from django.db.models import Q
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
 
@@ -7,7 +8,8 @@ from braces.views import(
     SuperuserRequiredMixin, SetHeadlineMixin, StaffuserRequiredMixin
 )
 
-from .models import Building
+from .mixins import NewTagMixin
+from .models import Building, Tag
 
 
 class BuildingListView(StaffuserRequiredMixin, ListView):
@@ -16,8 +18,27 @@ class BuildingListView(StaffuserRequiredMixin, ListView):
     """
     model = Building
 
+    def get_context_data(self, **kwargs):
+        """
+        Add tags to context
+        """
+        data = super(BuildingListView, self).get_context_data(**kwargs)
+        data.update({'tags': Tag.objects.all()})
+        data.update(self.request.GET.items())
+        return data
 
-class CreateBuildingView(SuperuserRequiredMixin, SetHeadlineMixin, CreateView):
+    def get_queryset(self):
+        """
+        Add tag filter to the queryset
+        """
+        qs = super(BuildingListView, self).get_queryset()
+        tag_name = self.request.GET.get('tag', 'all')
+        tag_Q = Q(tags__name=tag_name) if tag_name != 'all' else Q()
+        return qs.filter(tag_Q)
+
+
+class CreateBuildingView(SuperuserRequiredMixin, SetHeadlineMixin, NewTagMixin,
+                         CreateView):
     """
     Create new building
     """
@@ -26,7 +47,8 @@ class CreateBuildingView(SuperuserRequiredMixin, SetHeadlineMixin, CreateView):
     success_url = reverse_lazy('buildings:list')
 
 
-class UpdateBuildingView(SuperuserRequiredMixin, SetHeadlineMixin, UpdateView):
+class UpdateBuildingView(SuperuserRequiredMixin, SetHeadlineMixin, NewTagMixin,
+                         UpdateView):
     """
     Update building properties
     """
