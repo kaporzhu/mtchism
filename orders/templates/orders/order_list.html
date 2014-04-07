@@ -64,7 +64,7 @@
         <hr />
     </div>
     <div class="col-md-12">
-        <table class="table table-bordered table-hover">
+        <table id="orders" class="table table-bordered table-hover">
             <thead>
                 <tr>
                     <th>套餐</th>
@@ -73,6 +73,7 @@
                     <th>总价</th>
                     <th>配送地址</th>
                     <th>状态</th>
+                    <th><input type="checkbox" id="select-all-btn" /><label for="select-all-btn">全选</label></th>
                 </tr>
             </thead>
             <tbody>
@@ -91,8 +92,8 @@
                     <td>{{ order.address }}</td>
                     <td>
                         {{ order.get_status_display }}
-                        {{ order.get_operation_buttons|default_if_none:''|safe }}
                     </td>
+                    <td><input type="checkbox" class="select-row-btn" data-id="{{ order.id }}" /></td>
                 </tr>
                 {% empty %}
                 <tr>
