@@ -8,7 +8,8 @@ class CheckoutForm(forms.Form):
     """
     Form for checkout meals
     """
-    address = forms.CharField(widget=forms.HiddenInput)
+    building = forms.CharField(widget=forms.HiddenInput)
+    location = forms.CharField(widget=forms.HiddenInput)
     meals = forms.CharField(widget=forms.HiddenInput)
 
     def clean_meals(self):

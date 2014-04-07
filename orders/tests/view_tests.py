@@ -9,6 +9,7 @@ import mock
 
 from .factories import OrderFactory
 from accounts.tests.factories import UserFactory
+from buildings.tests.factories import BuildingFactory
 from meals.tests.factories import MealFactory
 from orders.constant import CANCELED, DONE
 from orders.forms import CheckoutForm
@@ -30,8 +31,9 @@ class CheckoutViewTests(TestCase):
         """
         form = CheckoutForm()
         meal = MealFactory()
+        building = BuildingFactory()
         form.cleaned_data = {'meals': [{'id': meal.id, 'amount': 1}],
-                             'address': 'address'}
+                             'building': building.id, 'location': ''}
         request = RequestFactory()
         request.user = UserFactory()
         view = CheckoutView()
@@ -39,6 +41,23 @@ class CheckoutViewTests(TestCase):
         response = view.form_valid(form)
         self.assertTrue(json.loads(response.content)['success'])
         self.assertTrue(Order.objects.exists())
+
+    def _fake_get_context_data(self):
+        """
+        Return empty dict directly
+        """
+        return {}
+
+    @mock.patch('django.views.generic.edit.FormView.get_context_data',
+                _fake_get_context_data)
+    def test_get_context_data(self):
+        """
+        Check if buildings is added to the context
+        """
+        building = BuildingFactory()
+        view = CheckoutView()
+        data = view.get_context_data()
+        self.assertTrue(building in data['buildings'])
 
 
 class MyOrderViewTests(TestCase):
@@ -130,9 +149,10 @@ class OrderListViewTests(TestCase):
         """
         request = RequestFactory()
         request.GET = {}
+        building = BuildingFactory()
         view = OrderListView()
         view.request = request
-        order = OrderFactory(address='China,110')
+        order = OrderFactory(building=building, location='location')
 
         # without any filter
         qs = view.get_queryset()
@@ -144,18 +164,15 @@ class OrderListViewTests(TestCase):
         self.assertFalse(qs.filter(id=order.id).exists())
 
         # address building filter
-        request.GET = {'building': 'Hangzhou', 'location': ''}
-        qs = view.get_queryset()
-        self.assertFalse(qs.filter(id=order.id).exists())
-        request.GET = {'building': 'China', 'location': ''}
+        request.GET = {'building': building.id, 'location': ''}
         qs = view.get_queryset()
         self.assertTrue(qs.filter(id=order.id).exists())
 
         # address location filter
-        request.GET = {'building': 'China', 'location': '111'}
+        request.GET = {'location': '111'}
         qs = view.get_queryset()
         self.assertFalse(qs.filter(id=order.id).exists())
-        request.GET = {'building': 'China', 'location': '110'}
+        request.GET = {'location': 'location'}
         qs = view.get_queryset()
         self.assertTrue(qs.filter(id=order.id).exists())
 
@@ -220,7 +237,7 @@ class OrderListViewTests(TestCase):
         view.request = request
         self.assertEqual(sorted(view.get_context_data().keys()),
                          sorted(['status_choices', 'status', 'building',
-                                 'location', 'created_start_dt',
+                                 'buildings', 'location', 'created_start_dt',
                                  'created_end_dt']))
 
 

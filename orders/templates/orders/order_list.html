@@ -36,9 +36,14 @@
             <div class="form-group">
                 <span>写字楼：&nbsp;&nbsp;&nbsp;</span>
                 <select name="building" class="form-control">
-                    <option value="all" selected="selected">所有写字楼</option>
-                    <option>百脑汇</option>
-                    <option>EAC(欧美中心)</option>
+                    <option value="all">所有写字楼</option>
+                    {% for b in buildings %}
+                        {% if b.id|lower == building %}
+                        <option selected="selected" value="{{ b.id }}">{{ b.name }}</option>
+                        {% else %}
+                        <option value="{{ b.id }}">{{ b.name }}</option>
+                        {% endif %}
+                    {% endfor %}
                 </select>
             </div>
             <div class="form-group">
@@ -116,7 +121,7 @@
                     <td>{{ order.total_amount }}</td>
                     <td>{{ order.created_at|date:"n月j日" }}</td>
                     <td>{{ order.total_price }}</td>
-                    <td>{{ order.address }}</td>
+                    <td>{{ order.building.name }}, {{ order.location }}</td>
                     <td class="status">
                         {{ order.get_status_display }}
                     </td>
