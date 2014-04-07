@@ -23,9 +23,9 @@ class Order(models.Model):
     )
 
     MEAL_TYPE_CHOICES = (
+        (LUNCH, u'午餐'),
         (BREAKFAST, u'早餐'),
-        (BREAKFAST, u'午餐'),
-        (BREAKFAST, u'晚餐'),
+        (SUPPER, u'晚餐'),
     )
 
     status = models.CharField(max_length=16, choices=STATUS_CHOICES,

@@ -52,11 +52,15 @@ class CheckoutViewTests(TestCase):
                 _fake_get_context_data)
     def test_get_context_data(self):
         """
-        Check if buildings is added to the context
+        Check if buildings, meal_type_choices and deliver times
+        are added to the context
         """
         building = BuildingFactory()
         view = CheckoutView()
         data = view.get_context_data()
+        self.assertEqual(
+            sorted(data['buildings'].keys()),
+            sorted(['buildings', 'meal_type_choices', 'deliver_times']))
         self.assertTrue(building in data['buildings'])
 
 

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 from datetime import datetime
 
 from django.core.urlresolvers import reverse
@@ -14,7 +15,7 @@ from braces.views import(
     AjaxResponseMixin
 )
 
-from .constant import CANCELED
+from .constant import CANCELED, DELIVER_TIMES
 from .forms import CheckoutForm
 from .models import Order, OrderMeal
 from buildings.models import Building
@@ -33,7 +34,9 @@ class CheckoutView(LoginRequiredMixin, JSONResponseMixin, FormView):
         Add buildings to context
         """
         data = super(CheckoutView, self).get_context_data(**kwargs)
-        data.update({'buildings': Building.objects.filter(is_active=True)})
+        data.update({'buildings': Building.objects.filter(is_active=True),
+                     'deliver_times': json.dumps(DELIVER_TIMES),
+                     'meal_type_choices': Order.MEAL_TYPE_CHOICES})
         return data
 
     def form_valid(self, form):
