@@ -31,6 +31,7 @@ ALLOWED_HOSTS = ['mtchism.com', 'www.mtchism.com']
 
 LOCAL_APPS = (
     'accounts',
+    'buildings',
     'foods',
     'meals',
     'mtchism',
