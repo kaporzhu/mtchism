@@ -40,6 +40,8 @@ $(document).ready(function(){
         var meals = get_meals().meals;
         var building = $('#building').val();
         var location = $('#location').val();
+        var meal_type = $('#meal-type-select').val();
+        var deliver_time = $('#deliver-time-select').val();
 
         if (location.length < 5) {
             alert('地址不够具体，我们的配送小哥会抓狂的。');
@@ -55,6 +57,8 @@ $(document).ready(function(){
                 meals: JSON.stringify(meals),
                 building: building,
                 location: location,
+                meal_type: meal_type,
+                deliver_time: deliver_time,
                 csrfmiddlewaretoken: get_cookie('csrftoken')
             },
             success: function(result) {

@@ -10,9 +10,9 @@
         <table class="table table-bordered table-hover">
             <thead>
                 <tr>
+                    <th>用餐时间</th>
                     <th>套餐</th>
                     <th>数量(份)</th>
-                    <th>下单时间</th>
                     <th>总价</th>
                     <th>配送地址</th>
                     <th>状态</th>
@@ -21,6 +21,7 @@
             <tbody>
                 {% for order in orders %}
                 <tr>
+                    <td>{{ order.get_meal_type_display }} {{ order.deliver_time }}</td>
                     <td>
                         <ul class="list-unstyled">
                             {% for ordermeal in order.ordermeal_set.all %}
@@ -29,7 +30,6 @@
                         </ul>
                     </td>
                     <td>{{ order.total_amount }}</td>
-                    <td>{{ order.created_at|date:"n月j日" }}</td>
                     <td>{{ order.total_price }}</td>
                     <td>{{ order.building.name }}, {{ order.location }}</td>
                     <td>

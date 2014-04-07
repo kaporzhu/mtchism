@@ -11,7 +11,7 @@ from .factories import OrderFactory
 from accounts.tests.factories import UserFactory
 from buildings.tests.factories import BuildingFactory
 from meals.tests.factories import MealFactory
-from orders.constant import CANCELED, DONE
+from orders.constant import CANCELED, DONE, LUNCH
 from orders.forms import CheckoutForm
 from orders.models import Order
 from orders.views import(
@@ -33,14 +33,19 @@ class CheckoutViewTests(TestCase):
         meal = MealFactory()
         building = BuildingFactory()
         form.cleaned_data = {'meals': [{'id': meal.id, 'amount': 1}],
-                             'building': building.id, 'location': ''}
+                             'building': building.id, 'location': '',
+                             'meal_type': LUNCH, 'deliver_time': '11:00-12:00'}
         request = RequestFactory()
         request.user = UserFactory()
         view = CheckoutView()
         view.request = request
         response = view.form_valid(form)
         self.assertTrue(json.loads(response.content)['success'])
-        self.assertTrue(Order.objects.exists())
+        order = Order.objects.get(building=building)
+        self.assertTrue(order.meal_type == form.cleaned_data['meal_type'])
+        self.assertTrue(order.deliver_time == form.cleaned_data['deliver_time'])  # noqa
+        self.assertTrue(order.location == form.cleaned_data['location'])
+        self.assertTrue(order.ordermeal_set.filter(meal=meal).exists())
 
     def _fake_get_context_data(self):
         """
@@ -59,7 +64,7 @@ class CheckoutViewTests(TestCase):
         view = CheckoutView()
         data = view.get_context_data()
         self.assertEqual(
-            sorted(data['buildings'].keys()),
+            sorted(data.keys()),
             sorted(['buildings', 'meal_type_choices', 'deliver_times']))
         self.assertTrue(building in data['buildings'])
 

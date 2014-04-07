@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.core.urlresolvers import reverse
 from django.db.models import Q
@@ -45,6 +45,14 @@ class CheckoutView(LoginRequiredMixin, JSONResponseMixin, FormView):
         """
         data = form.cleaned_data
         location = data['location']
+        meal_type = data['meal_type']
+        deliver_time = data['deliver_time']
+        # if it's still earlier than 3am, we think it's yesterday
+        now = datetime.now()
+        if now.hour >= 0 and now.hour < 3:
+            tomorrow = now
+        else:
+            tomorrow = datetime.now() + timedelta(days=1)
         building = Building.objects.get(pk=data['building'])
 
         # update user address
@@ -55,7 +63,8 @@ class CheckoutView(LoginRequiredMixin, JSONResponseMixin, FormView):
 
         # create order
         order = Order(creator=self.request.user, location=location,
-                      building=building)
+                      building=building, meal_type=meal_type,
+                      deliver_time=deliver_time, deliver_date=tomorrow)
         order.save()
         total_price = 0
         total_amount = 0

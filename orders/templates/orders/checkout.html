@@ -33,7 +33,7 @@
             </div>
             <br /><br />
             <div class="form-group">
-                <span>送餐时间：</span>
+                <span class="label label-warning">明天({% now "l" %})</span>
                 <select id="meal-type-select" class="form-control input-sm">
                     {% for type in meal_type_choices %}
                     <option value="{{ type.0 }}">{{ type.1 }}</option>
@@ -42,7 +42,7 @@
                 <select id="deliver-time-select" class="form-control input-sm" data-deliver-times="{{ deliver_times }}">
                     <option class="default" selected="selected" value="">选择您最适合的用餐时间</option>
                 </select>
-                <small>按时吃饭是大事，我们确保准时送到。只能帮你到这了。</small>
+                <small>按时吃饭是大事，我们确保准时送到。只能帮到这了。</small>
             </div>
         </form>
         <hr />
