@@ -53,7 +53,8 @@ $(document).ready(function(){
             dataType: 'json',
             data: {
                 meals: JSON.stringify(meals),
-                address: building + ',' + location,
+                building: building,
+                location: location,
                 csrfmiddlewaretoken: get_cookie('csrftoken')
             },
             success: function(result) {

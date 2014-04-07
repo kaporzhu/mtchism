@@ -17,6 +17,7 @@ from braces.views import(
 from .constant import CANCELED
 from .forms import CheckoutForm
 from .models import Order, OrderMeal
+from buildings.models import Building
 from meals.models import Meal
 
 
@@ -27,12 +28,31 @@ class CheckoutView(LoginRequiredMixin, JSONResponseMixin, FormView):
     template_name = 'orders/checkout.html'
     form_class = CheckoutForm
 
+    def get_context_data(self, **kwargs):
+        """
+        Add buildings to context
+        """
+        data = super(CheckoutView, self).get_context_data(**kwargs)
+        data.update({'buildings': Building.objects.filter(is_active=True)})
+        return data
+
     def form_valid(self, form):
         """
         Create order here
         """
         data = form.cleaned_data
-        order = Order(creator=self.request.user, address=data['address'])
+        location = data['location']
+        building = Building.objects.get(pk=data['building'])
+
+        # update user address
+        profile = self.request.user.profile
+        profile.building = building
+        profile.location = location
+        profile.save()
+
+        # create order
+        order = Order(creator=self.request.user, location=location,
+                      building=building)
         order.save()
         total_price = 0
         total_amount = 0
@@ -111,9 +131,10 @@ class OrderListView(StaffuserRequiredMixin, ListView):
         status = self.request.GET.get('status')
         status = status if status else 'all'
 
-        # address
-        building = self.request.GET.get('building',)
-        building = building if building else 'all'
+        # building
+        building = self.request.GET.get('building', 'all')
+
+        # location
         location = self.request.GET.get('location', '')
 
         # created time
@@ -144,9 +165,16 @@ class OrderListView(StaffuserRequiredMixin, ListView):
         status = params['status']
         status_Q = Q(status=status) if status != 'all' else Q()
 
-        # address
-        address = u'{},{}'.format(params['building'], params['location'])
-        address_Q = Q(address__contains=address) if address != 'all,' else Q()
+        # building
+        building = params['building']
+        if building != 'all':
+            building_Q = Q(building=Building.objects.get(pk=building))
+        else:
+            building_Q = Q()
+
+        # location
+        location = params['location']
+        location_Q = Q(location__icontains=location) if location else Q()
 
         # created time
         start_dt = params['created_start_dt']
@@ -159,14 +187,15 @@ class OrderListView(StaffuserRequiredMixin, ListView):
         elif end_dt:
             created_time_Q = Q(created_at__lte=end_dt)
 
-        return qs.filter(status_Q, address_Q, created_time_Q)
+        return qs.filter(status_Q, building_Q, location_Q, created_time_Q)
 
     def get_context_data(self, **kwargs):
         """
         Add extra data to context
         """
         data = super(OrderListView, self).get_context_data(**kwargs)
-        data.update({'status_choices': Order.STATUS_CHOICES})
+        data.update({'status_choices': Order.STATUS_CHOICES,
+                     'buildings': Building.objects.filter(is_active=True)})
         data.update(self.get_params_from_request())
         return data
 

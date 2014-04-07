@@ -4,6 +4,7 @@ from django.core.urlresolvers import reverse
 from django.db import models
 
 from .constant import CREATED, PAID, DONE, CANCELED
+from buildings.models import Building
 from meals.models import Meal
 
 
@@ -23,7 +24,8 @@ class Order(models.Model):
                               default=CREATED)
     total_price = models.FloatField(default=0)
     total_amount = models.IntegerField(default=0)
-    address = models.CharField(max_length=256, blank=True)
+    building = models.ForeignKey(Building, null=True)
+    location = models.CharField(max_length=256, blank=True)
     creator = models.ForeignKey(User)
     created_at = models.DateTimeField(auto_now_add=True)
 

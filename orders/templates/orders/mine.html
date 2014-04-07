@@ -31,7 +31,7 @@
                     <td>{{ order.total_amount }}</td>
                     <td>{{ order.created_at|date:"n月j日" }}</td>
                     <td>{{ order.total_price }}</td>
-                    <td>{{ order.address }}</td>
+                    <td>{{ order.building.name }}, {{ order.location }}</td>
                     <td>
                         {{ order.get_status_display }}
                         {{ order.get_operation_buttons|default_if_none:''|safe }}

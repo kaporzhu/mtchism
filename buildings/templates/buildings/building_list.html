@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block title %}写字楼管理{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-12">
+        {% if not tag or tag == 'all' %}
+            <a href="{% url 'buildings:list' %}?tag=all" class="label label-info">所有</a>
+        {% else %}
+            <a href="{% url 'buildings:list' %}?tag=all" class="label label-default">所有</a>
+        {% endif %}
+        {% for t in tags %}
+            {% if t.name == tag %}
+                <a href="{% url 'buildings:list' %}?tag={{ t.name }}" class="label label-info">{{ t.name }}</a>
+            {% else %}
+                <a href="{% url 'buildings:list' %}?tag={{ t.name }}" class="label label-default">{{ t.name }}</a>
+            {% endif %}
+        {% endfor %}
+    </div>
+    <div class="col-md-12">
+        <div class="btn-group pull-right">
+            <a type="button" href="{% url 'buildings:create' %}" class="btn btn-default">添加</a>
+        </div>
+        <br /><br />
+        <table id="buildings" class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>写字楼</th>
+                    <th>地址</th>
+                    <th>类别</th>
+                    <th>状态</th>
+                    <th>备注</th>
+                    <th>修改</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for building in object_list %}
+                <tr>
+                    <td>{{ building.name }}</td>
+                    <td>{{ building.address }}</td>
+                    <td>
+                        {% for t in building.tags.all %}
+                            {% if t.name == tag %}
+                                <a href="{% url 'buildings:list' %}?tag={{ t.name }}" class="label label-info">{{ t.name }}</a>
+                            {% else %}
+                                <a href="{% url 'buildings:list' %}?tag={{ t.name }}" class="label label-default">{{ t.name }}</a>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>{{ building.is_active }}</td>
+                    <td>{{ building.tips }}</td>
+                    <td><a href="{% url 'buildings:update' pk=building.id %}"><span class="glyphicon glyphicon-edit"></span></a></td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center">暂时还没有写字楼</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load staticfiles mtchism_template_tags %}
+
+{% block title %}{{ headline }}{% endblock %}
+
+{% block extrajs %}
+<script src="{% static 'js/building.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <form method="post" class="form-horizontal col-md-12" role="form">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="form-group">
+            <label class="col-md-2 control-label">{{ field.label }}: </label>
+            <div class="col-sm-6">
+                {% if field|is_checkbox %}
+                    {{ field }}
+                {% else %}
+                    {{ field|add_attr:"class,form-control" }}
+                {% endif %}
+                {% if field.name == 'tags' %}
+                <input type="text" class="text" placeholder="添加类别" id="new-tag-input" /><input type="button" class="btn btn-default" id="add-tag-btn" value="添加" />
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+        <div class="form-group">
+            <label class="col-md-2 control-label">{{ field.label }}</label>
+            <div class="col-sm-6 text-right">
+                <input type="submit" class="btn btn-primary" value="提交" />
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

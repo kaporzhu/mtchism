@@ -21,10 +21,15 @@
             <div class="form-group">
                 <span>配送地址：</span>
                 <select id="building" class="form-control input-sm">
-                    <option>百脑汇</option>
-                    <option>EAC(欧美中心)</option>
+                    {% for building in buildings %}
+                        {% if user.profile.building == building %}
+                            <option selected="selected" value="{{ building.id }}">{{ building.name }}</option>
+                        {% else %}
+                            <option value="{{ building.id }}">{{ building.name }}</option>
+                        {% endif %}
+                    {% endfor %}
                 </select>
-                <input type="text" id="location" class="form-control input-sm" placeholder="请尽可能详细。如A座三单元1005-2 B区02" />
+                <input type="text" id="location" class="form-control input-sm" value="{{ user.profile.location|default_if_none:'' }}" placeholder="请尽可能详细。如A座三单元1005-2 B区02" />
             </div>
         </form>
         <hr />
