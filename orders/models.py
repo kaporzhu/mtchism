@@ -13,10 +13,10 @@ class Order(models.Model):
     """
 
     STATUS_CHOICES = (
-        (CREATED, '等待付款'),
-        (PAID, '等待配送'),
-        (DONE, '已完成'),
-        (CANCELED, '已取消'),
+        (CREATED, u'等待付款'),
+        (PAID, u'等待配送'),
+        (DONE, u'已完成'),
+        (CANCELED, u'已取消'),
     )
 
     status = models.CharField(max_length=16, choices=STATUS_CHOICES,
@@ -47,6 +47,16 @@ class Order(models.Model):
             return '{}{}'.format(cancel_btn, pay_btn)
 
         return None
+
+    @classmethod
+    def get_status_label(cls, status):
+        """
+        Get the status display from status
+        """
+        for choice in cls.STATUS_CHOICES:
+            if choice[0] == status:
+                return choice[1]
+        raise ValueError('Invalid status value')
 
 
 class OrderMeal(models.Model):

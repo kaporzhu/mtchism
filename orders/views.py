@@ -4,13 +4,14 @@ from datetime import datetime
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.shortcuts import redirect
-from django.views.generic.base import TemplateView, RedirectView
+from django.views.generic.base import TemplateView, RedirectView, View
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from django.views.generic.list import ListView
 
 from braces.views import(
-    LoginRequiredMixin, JSONResponseMixin, StaffuserRequiredMixin
+    LoginRequiredMixin, JSONResponseMixin, StaffuserRequiredMixin,
+    AjaxResponseMixin
 )
 
 from .constant import CANCELED
@@ -107,11 +108,13 @@ class OrderListView(StaffuserRequiredMixin, ListView):
         Check all params and return as dict
         """
         # status
-        status = self.request.GET.get('status', 'all')
+        status = self.request.GET.get('status')
+        status = status if status else 'all'
 
         # address
-        building = self.request.GET.get('building', 'all')
-        location = self.request.GET.get('location')
+        building = self.request.GET.get('building',)
+        building = building if building else 'all'
+        location = self.request.GET.get('location', '')
 
         # created time
         try:
@@ -166,3 +169,21 @@ class OrderListView(StaffuserRequiredMixin, ListView):
         data.update({'status_choices': Order.STATUS_CHOICES})
         data.update(self.get_params_from_request())
         return data
+
+
+class UpdateOrderStatusView(StaffuserRequiredMixin, JSONResponseMixin,
+                            AjaxResponseMixin, View):
+    """
+    Update order status and go back to the order list page
+    """
+    raise_exception = True
+
+    def get_ajax(self, request, *args, **kwargs):
+        """
+        Update order status here
+        """
+        status = request.GET['status']
+        orders = Order.objects.filter(id__in=request.GET['ids'].split(','))
+        orders.update(status=status)
+        return self.render_json_response(
+            {'success': True, 'new_status': Order.get_status_label(status)})

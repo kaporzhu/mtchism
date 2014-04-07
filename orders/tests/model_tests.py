@@ -3,6 +3,7 @@ from django.test.testcases import TestCase
 
 from .factories import OrderFactory
 from orders.constant import CREATED, PAID
+from orders.models import Order
 
 
 class OrderTests(TestCase):
@@ -23,3 +24,10 @@ class OrderTests(TestCase):
         order.status = PAID
         buttons = order.get_operation_buttons()
         self.assertIsNone(buttons)
+
+    def test_get_status_label(self):
+        """
+        Check if the status label is returned
+        """
+        self.assertEqual(u'等待付款', Order.get_status_label(CREATED))
+        self.assertRaises(ValueError, lambda: Order.get_status_label('!!!'))

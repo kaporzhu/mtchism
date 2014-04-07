@@ -64,21 +64,48 @@
         <hr />
     </div>
     <div class="col-md-12">
+        <div class="btn-group">
+            <div class="btn-group">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">选取
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="javascript:void(0)" data-type="all" class="select-rows-btn">全选</a></li>
+                    <li><a href="javascript:void(0)" data-type="none" class="select-rows-btn">全不选</a></li>
+                    <li><a href="javascript:void(0)" data-type="invert" class="select-rows-btn">反选</a></li>
+                </ul>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                    <span>标记为</span>
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" data-update-status-url="{% url 'orders:update_status' %}">
+                    {% for choice in status_choices %}
+                    <li><a href="javascript:void(0)" data-status="{{ choice.0 }}" class="update-status-btn">{{ choice.1 }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <br /><br />
         <table id="orders" class="table table-bordered table-hover">
             <thead>
                 <tr>
+                    <th>选取</th>
                     <th>套餐</th>
                     <th>数量(份)</th>
                     <th>下单时间</th>
                     <th>总价</th>
                     <th>配送地址</th>
                     <th>状态</th>
-                    <th><input type="checkbox" id="select-all-btn" /><label for="select-all-btn">全选</label></th>
                 </tr>
             </thead>
             <tbody>
                 {% for order in object_list %}
                 <tr>
+                    <td>
+                        <input type="checkbox" class="select-row-btn" data-id="{{ order.id }}" />
+                    </td>
                     <td>
                         <ul class="list-unstyled">
                             {% for ordermeal in order.ordermeal_set.all %}
@@ -90,14 +117,13 @@
                     <td>{{ order.created_at|date:"n月j日" }}</td>
                     <td>{{ order.total_price }}</td>
                     <td>{{ order.address }}</td>
-                    <td>
+                    <td class="status">
                         {{ order.get_status_display }}
                     </td>
-                    <td><input type="checkbox" class="select-row-btn" data-id="{{ order.id }}" /></td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="6">暂时还没有订单</td>
+                    <td colspan="7" class="text-center">暂时还没有订单</td>
                 </tr>
                 {% endfor %}
             </tbody>
