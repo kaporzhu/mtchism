@@ -58,8 +58,10 @@ $(document).ready(function(){
     $('.add-to-cart').click(function(event){
         var id = $(this).data('id');
         var name = $(this).data('name');
+        var limitations = $(this).data('limitations');
+        
         var price = parseFloat( $(this).data('price'));
-        add_meal(id, name, price);
+        add_meal(id, name, price, limitations);
         load_meals();
         return false;
     });

@@ -165,5 +165,6 @@ class MealIndexView(TemplateView):
         Add extra data to context
         """
         data = super(MealIndexView, self).get_context_data(**kwargs)
-        data.update({'meals': Meal.objects.all()})
+        data.update({'meals': Meal.objects.all(),
+                     'meal_types': Meal.MEAL_TYPES})
         return data

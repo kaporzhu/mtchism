@@ -61,10 +61,16 @@ class Meal(models.Model):
     Each meal in a day.
     """
     MEAL_TYPE_CHOICES = (
-        (LUNCH, u'午餐'),
         (BREAKFAST, u'早餐'),
+        (LUNCH, u'午餐'),
         (SUPPER, u'晚餐'),
     )
+
+    MEAL_TYPES = {
+        BREAKFAST: u'早餐',
+        LUNCH: u'午餐',
+        SUPPER: u'晚餐',
+    }
 
     name = models.CharField(max_length=128)
     dishes = models.ManyToManyField(Dish)
@@ -77,12 +83,22 @@ class Meal(models.Model):
 
     def get_limitations(self):
         """
+        Get limitations in dict
+        """
+        limitations = []
+        for limit in json.loads(self.limitations):
+            if limit in self.MEAL_TYPES:
+                limitations.append({'type': limit,
+                                    'label': self.MEAL_TYPES[limit]})
+        return json.dumps(limitations)
+
+    def get_limitations_display(self):
+        """
         Get limitation label
         """
         limitations = []
         if self.limitations:
             for limit in json.loads(self.limitations):
-                for choice in self.MEAL_TYPE_CHOICES:
-                    if choice[0] == limit:
-                        limitations.append(choice[1])
+                if limit in self.MEAL_TYPES:
+                    limitations.append(self.MEAL_TYPES[limit])
         return ','.join(limitations)

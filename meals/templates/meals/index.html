@@ -20,10 +20,10 @@
             {% for meal in meals %}
             <span class="list-group-item">
                 <h4 class="list-group-item-heading">
-                    <span class="meal-name">{{ meal.name }}</span>
-                    <a href="javascript:void(0)" class="add-to-cart pull-right text-center" data-id="{{ meal.id }}" data-name="{{ meal.name }}" data-price="{{ meal.price }}">
+                    <span class="meal-name">{{ meal.name }}<small>({{ meal.get_limitations_display }})</small></span>
+                    <a href="javascript:void(0)" class="add-to-cart pull-right text-center" data-id="{{ meal.id }}" data-name="{{ meal.name }}" data-price="{{ meal.price }}" data-limitations="{{ meal.get_limitations }}">
                         <span class="glyphicon glyphicon-shopping-cart"></span><br />
-                        <span>￥{{ meal.price }}</span>
+                        <span><small>￥{{ meal.price }}</small></span>
                     </a>
                 </h4>
                 <p class="list-group-item-text dishes">
@@ -96,7 +96,7 @@
         <script id='selected-meal-template' type='text/ractive'>
             {{#meals}}
             <li class="list-group-item meal" data-id="{{id}}">
-                <b class="name">{{name}}</b> x <span class="amount">{{amount}}</span> = <span class="subtotal">{{subtotal}}</span>
+                <span class="name">{{name}}</span> x <span class="amount">{{amount}}</span> = <span class="subtotal">{{subtotal}}</span>
                 <div class="btn-group pull-right">
                     <button type="button" class="btn btn-default btn-xs plus-meal">
                         <span class="glyphicon glyphicon-plus"></span>

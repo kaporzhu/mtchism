@@ -12,6 +12,7 @@ from meals.models import Meal, Dish, DishFood
 from meals.views import(
     CreateMealView, CreateDishView, UpdateDishFoodsView, MealIndexView
 )
+from django.http.request import QueryDict
 
 
 class CreateMealViewTests(TestCase):
@@ -38,7 +39,7 @@ class CreateMealViewTests(TestCase):
         view.request = request
 
         # create form
-        form = MealForm({'name': 'Meal name'})
+        form = MealForm(QueryDict('name=Meal name&price=10&limitations=lunch'))
 
         # test now
         view.form_valid(form)

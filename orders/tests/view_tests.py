@@ -32,9 +32,13 @@ class CheckoutViewTests(TestCase):
         form = CheckoutForm()
         meal = MealFactory()
         building = BuildingFactory()
-        form.cleaned_data = {'meals': [{'id': meal.id, 'amount': 1}],
-                             'building': building.id, 'location': '',
-                             'meal_type': LUNCH, 'deliver_time': '11:00-12:00'}
+        form.cleaned_data = {
+            'meals': [{'id': meal.id, 'amount': 1, 'meal_type': LUNCH}],
+            'building': building.id, 'location': '',
+            'breakfast_deliver_time': '11:00-12:00',
+            'lunch_deliver_time': '11:00-12:00',
+            'supper_deliver_time': '',
+        }
         request = RequestFactory()
         request.user = UserFactory()
         view = CheckoutView()
@@ -42,11 +46,20 @@ class CheckoutViewTests(TestCase):
         response = view.form_valid(form)
         self.assertTrue(json.loads(response.content)['success'])
         order = Order.objects.get(building=building)
-        self.assertTrue(order.meal_type == form.cleaned_data['meal_type'])
-        self.assertTrue(order.deliver_time == form.cleaned_data['deliver_time'])  # noqa
-        self.assertTrue(order.location == form.cleaned_data['location'])
-        self.assertTrue(getattr(order.creator.profile, 'preferred_{}_time'.format(LUNCH)) == form.cleaned_data['deliver_time'])  # noqa
+        self.assertEqual(order.breakfast_deliver_time,
+                         form.cleaned_data['breakfast_deliver_time'])
+        self.assertEqual(order.lunch_deliver_time,
+                         form.cleaned_data['lunch_deliver_time'])
+        self.assertEqual(order.supper_deliver_time, '')
+        self.assertEqual(order.location,
+                         form.cleaned_data['location'])
+        self.assertEqual(
+            getattr(order.creator.profile, 'preferred_{}_time'.format(LUNCH)),
+            form.cleaned_data['lunch_deliver_time'])
         self.assertTrue(order.ordermeal_set.filter(meal=meal).exists())
+        order_meal = order.ordermeal_set.get(meal=meal)
+        self.assertEqual(order_meal.meal_type, LUNCH)
+        self.assertEqual(order_meal.deliver_time, form.cleaned_data['lunch_deliver_time'])
 
     def _fake_get_context_data(self):
         """
@@ -178,9 +191,7 @@ class OrderListViewTests(TestCase):
         building = BuildingFactory()
         view = OrderListView()
         view.request = request
-        order = OrderFactory(building=building, location='location',
-                             meal_type=LUNCH,
-                             deliver_time=DELIVER_TIMES[LUNCH][0])
+        order = OrderFactory(building=building, location='location')
 
         # without any filter
         qs = view.get_queryset()

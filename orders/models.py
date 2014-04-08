@@ -29,10 +29,10 @@ class Order(models.Model):
     total_amount = models.IntegerField(default=0)
     building = models.ForeignKey(Building, null=True)
     location = models.CharField(max_length=256, blank=True)
-    deliver_time = models.CharField(max_length=16, blank=True)
+    breakfast_deliver_time = models.CharField(max_length=16, blank=True)
+    lunch_deliver_time = models.CharField(max_length=16, blank=True)
+    supper_deliver_time = models.CharField(max_length=16, blank=True)
     deliver_date = models.DateField(auto_now_add=True)
-    meal_type = models.CharField(max_length=16, choices=Meal.MEAL_TYPE_CHOICES,
-                                 default=LUNCH)
     creator = models.ForeignKey(User)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -75,5 +75,9 @@ class OrderMeal(models.Model):
     meal = models.ForeignKey(Meal)
     order = models.ForeignKey(Order)
     amount = models.IntegerField()
+    meal_type = models.CharField(max_length=16, choices=Meal.MEAL_TYPE_CHOICES,
+                                 blank=True)
+    deliver_time = models.CharField(max_length=16, blank=True)
+
     creator = models.ForeignKey(User)
     created_at = models.DateTimeField(auto_now_add=True)
