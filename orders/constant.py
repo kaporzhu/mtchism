@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
 # order status
+from meals.constant import BREAKFAST, LUNCH, SUPPER
+
+
 CREATED = 'created'
 PAID = 'paid'
 DONE = 'done'
 CANCELED = 'canceled'
-
-
-# meal type
-BREAKFAST = 'breakfast'
-LUNCH = 'lunch'
-SUPPER = 'supper'
 
 # deliver time
 DELIVER_TIMES = {

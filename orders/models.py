@@ -4,9 +4,10 @@ from django.core.urlresolvers import reverse
 from django.db import models
 
 from .constant import(
-    CREATED, PAID, DONE, CANCELED, BREAKFAST, LUNCH, SUPPER
+    CREATED, PAID, DONE, CANCELED
 )
 from buildings.models import Building
+from meals.constant import LUNCH
 from meals.models import Meal
 
 
@@ -22,12 +23,6 @@ class Order(models.Model):
         (CANCELED, u'已取消'),
     )
 
-    MEAL_TYPE_CHOICES = (
-        (LUNCH, u'午餐'),
-        (BREAKFAST, u'早餐'),
-        (SUPPER, u'晚餐'),
-    )
-
     status = models.CharField(max_length=16, choices=STATUS_CHOICES,
                               default=CREATED)
     total_price = models.FloatField(default=0)
@@ -36,7 +31,7 @@ class Order(models.Model):
     location = models.CharField(max_length=256, blank=True)
     deliver_time = models.CharField(max_length=16, blank=True)
     deliver_date = models.DateField(auto_now_add=True)
-    meal_type = models.CharField(max_length=16, choices=MEAL_TYPE_CHOICES,
+    meal_type = models.CharField(max_length=16, choices=Meal.MEAL_TYPE_CHOICES,
                                  default=LUNCH)
     creator = models.ForeignKey(User)
     created_at = models.DateTimeField(auto_now_add=True)
