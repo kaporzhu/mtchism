@@ -59,6 +59,7 @@ class Meal(models.Model):
     """
     name = models.CharField(max_length=128)
     dishes = models.ManyToManyField(Dish)
+    price = models.FloatField(default=0)
 
     creator = models.ForeignKey(User)
     created_at = models.DateTimeField(auto_now_add=True)
