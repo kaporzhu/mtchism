@@ -39,7 +39,7 @@
                     <option value="{{ type.0 }}">{{ type.1 }}</option>
                     {% endfor %}
                 </select>
-                <select id="deliver-time-select" class="form-control input-sm" data-deliver-times="{{ deliver_times }}">
+                <select id="deliver-time-select" class="form-control input-sm" data-deliver-times="{{ deliver_times }}" data-preferred-lunch-time="{{ user.profile.preferred_lunch_time }}"  data-preferred-supper-time="{{ user.profile.preferred_supper_time|default_if_none:'' }}" data-preferred-breakfast-time="{{ user.profile.preferred_breakfast_time|default_if_none:'' }}">
                     <option class="default" selected="selected" value="">选择您最适合的用餐时间</option>
                 </select>
                 <small>按时吃饭是大事，我们确保准时送到。只能帮到这了。</small>

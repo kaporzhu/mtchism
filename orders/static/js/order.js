@@ -80,10 +80,15 @@ $(document).ready(function(){
     // deliver times select
     function update_deliver_times(meal_type) {
         var $deliver_times_select = $('#deliver-time-select');
+        var perferred_time = $deliver_times_select.data('preferred-'+meal_type+'-time');
         $deliver_times_select.children('option:not(.default)').remove();
         var deliver_times = $deliver_times_select.data('deliver-times');
         $.each(deliver_times[meal_type], function(index, value){
-            $deliver_times_select.append($('<option>').attr('value', value).text(value));
+            if (perferred_time == value) {
+                $deliver_times_select.append($('<option>').attr('selected', 'selected').attr('value', value).text(value));
+            } else {
+                $deliver_times_select.append($('<option>').attr('value', value).text(value));
+            }
         });
     }
 });

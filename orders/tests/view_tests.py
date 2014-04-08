@@ -45,6 +45,7 @@ class CheckoutViewTests(TestCase):
         self.assertTrue(order.meal_type == form.cleaned_data['meal_type'])
         self.assertTrue(order.deliver_time == form.cleaned_data['deliver_time'])  # noqa
         self.assertTrue(order.location == form.cleaned_data['location'])
+        self.assertTrue(getattr(order.creator.profile, 'preferred_{}_time'.format(LUNCH)) == form.cleaned_data['deliver_time'])  # noqa
         self.assertTrue(order.ordermeal_set.filter(meal=meal).exists())
 
     def _fake_get_context_data(self):

@@ -13,6 +13,9 @@ class Profile(models.Model):
     user = models.OneToOneField(User)
     building = models.ForeignKey(Building, null=True)
     location = models.CharField(max_length=128, blank=True)
+    preferred_breakfast_time = models.CharField(max_length=16, blank=True)
+    preferred_lunch_time = models.CharField(max_length=16, blank=True)
+    preferred_supper_time = models.CharField(max_length=16, blank=True)
 
 
 def create_user_profile(sender, instance, created, **kwargs):

@@ -51,10 +51,11 @@ class CheckoutView(LoginRequiredMixin, JSONResponseMixin, FormView):
         deliver_time = data['deliver_time']
         building = Building.objects.get(pk=data['building'])
 
-        # update user address
+        # update user address and preferred time
         profile = self.request.user.profile
         profile.building = building
         profile.location = location
+        setattr(profile, 'preferred_{}_time'.format(meal_type), deliver_time)
         profile.save()
 
         # create order
