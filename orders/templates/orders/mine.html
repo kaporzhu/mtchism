@@ -8,18 +8,12 @@
 <div class="row">
     <div class="col-md-12">
         <table class="table table-bordered table-hover">
-            <thead>
-                <tr>
-                    <th>配送时间</th>
-                    <th>套餐</th>
-                    <th>数量(份)</th>
-                    <th>总价</th>
-                    <th>配送地址</th>
-                    <th>状态</th>
-                </tr>
-            </thead>
             <tbody>
-                {% for order in orders %}
+            {% if my_orders.tomorrow %}
+                <tr>
+                    <td colspan="5"><strong>明天</strong></td>
+                </tr>
+                {% for order in my_orders.tomorrow %}
                 <tr>
                     <td>{{ order.get_meal_type_display }} {{ order.deliver_time }}</td>
                     <td>
@@ -29,19 +23,63 @@
                             {% endfor %}
                         </ul>
                     </td>
-                    <td>{{ order.total_amount }}</td>
-                    <td>{{ order.total_price }}</td>
+                    <td>{{ order.total_price }}元</td>
                     <td>{{ order.building.name }}, {{ order.location }}</td>
                     <td>
                         {{ order.get_status_display }}
                         {{ order.get_operation_buttons|default_if_none:''|safe }}
                     </td>
                 </tr>
-                {% empty %}
+                {% endfor %}
+            {% endif %}
+
+            {% if my_orders.today %}
                 <tr>
-                    <td colspan="6">暂时还没有订单</td>
+                    <td colspan="5"><strong>今天</strong></td>
+                </tr>
+                {% for order in my_orders.today %}
+                <tr>
+                    <td>{{ order.get_meal_type_display }} {{ order.deliver_time }}</td>
+                    <td>
+                        <ul class="list-unstyled">
+                            {% for ordermeal in order.ordermeal_set.all %}
+                            <li>{{ ordermeal.meal.name }} x {{ ordermeal.amount }}</li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                    <td>{{ order.total_price }}元</td>
+                    <td>{{ order.building.name }}, {{ order.location }}</td>
+                    <td>
+                        {{ order.get_status_display }}
+                        {{ order.get_operation_buttons|default_if_none:''|safe }}
+                    </td>
                 </tr>
                 {% endfor %}
+            {% endif %}
+
+            {% if my_orders.yesterday %}
+                <tr>
+                    <td colspan="5"><strong>昨天</strong></td>
+                </tr>
+                {% for order in my_orders.yesterday %}
+                <tr>
+                    <td>{{ order.get_meal_type_display }} {{ order.deliver_time }}</td>
+                    <td>
+                        <ul class="list-unstyled">
+                            {% for ordermeal in order.ordermeal_set.all %}
+                            <li>{{ ordermeal.meal.name }} x {{ ordermeal.amount }}</li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                    <td>{{ order.total_price }}元</td>
+                    <td>{{ order.building.name }}, {{ order.location }}</td>
+                    <td>
+                        {{ order.get_status_display }}
+                        {{ order.get_operation_buttons|default_if_none:''|safe }}
+                    </td>
+                </tr>
+                {% endfor %}
+            {% endif %}
             </tbody>
         </table>
     </div>

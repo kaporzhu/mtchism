@@ -65,7 +65,7 @@ class CheckoutViewTests(TestCase):
         data = view.get_context_data()
         self.assertEqual(
             sorted(data.keys()),
-            sorted(['buildings', 'meal_type_choices', 'deliver_times']))
+            sorted(['buildings', 'meal_type_choices', 'deliver_times', 'tomorrow']))  # noqa
         self.assertTrue(building in data['buildings'])
 
 
@@ -87,13 +87,26 @@ class MyOrderViewTests(TestCase):
         Check if my orders are added to the context
         """
         user = UserFactory()
-        order = OrderFactory(creator=user)
+        order_today = OrderFactory(creator=user)
+        order_tomorrow = OrderFactory(creator=user)
+        order_tomorrow.deliver_date = datetime.now() + timedelta(days=1)
+        order_tomorrow.save()
+        order_yesterday = OrderFactory(creator=user)
+        order_yesterday.deliver_date = datetime.now() - timedelta(days=1)
+        order_yesterday.save()
+        order_older = OrderFactory(creator=user)
+        order_older.deliver_date = datetime.now() - timedelta(days=2)
+        order_older.save()
         request = RequestFactory()
         request.user = user
         view = MyOrderView()
         view.request = request
         data = view.get_context_data()
-        self.assertIn(order, data['orders'])
+        self.assertEqual(sorted(['tomorrow', 'today', 'yesterday']),
+                         sorted(data['my_orders']))
+        self.assertIn(order_today, data['my_orders']['today'])
+        self.assertIn(order_tomorrow, data['my_orders']['tomorrow'])
+        self.assertIn(order_yesterday, data['my_orders']['yesterday'])
 
 
 class CancelOrderViewTests(TestCase):
@@ -286,5 +299,5 @@ class UpdateOrderStatusViewTests(TestCase):
         request.GET = {'status': DONE, 'ids': str(order.id)}
         view = UpdateOrderStatusView()
         response = view.get_ajax(request)
-        self.assertTrue(json.loads(response.content)['success'] == True)
+        self.assertTrue(json.loads(response.content)['success'])
         self.assertTrue(Order.objects.get(pk=order.id).status == DONE)

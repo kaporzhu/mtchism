@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from django.core.urlresolvers import reverse
 from django.db.models import Q
@@ -18,6 +18,7 @@ from braces.views import(
 from .constant import CANCELED, DELIVER_TIMES
 from .forms import CheckoutForm
 from .models import Order, OrderMeal
+from .utils import get_tomorrow
 from buildings.models import Building
 from meals.models import Meal
 
@@ -36,7 +37,8 @@ class CheckoutView(LoginRequiredMixin, JSONResponseMixin, FormView):
         data = super(CheckoutView, self).get_context_data(**kwargs)
         data.update({'buildings': Building.objects.filter(is_active=True),
                      'deliver_times': json.dumps(DELIVER_TIMES),
-                     'meal_type_choices': Order.MEAL_TYPE_CHOICES})
+                     'meal_type_choices': Order.MEAL_TYPE_CHOICES,
+                     'tomorrow': get_tomorrow()})
         return data
 
     def form_valid(self, form):
@@ -47,12 +49,6 @@ class CheckoutView(LoginRequiredMixin, JSONResponseMixin, FormView):
         location = data['location']
         meal_type = data['meal_type']
         deliver_time = data['deliver_time']
-        # if it's still earlier than 3am, we think it's yesterday
-        now = datetime.now()
-        if now.hour >= 0 and now.hour < 3:
-            tomorrow = now
-        else:
-            tomorrow = datetime.now() + timedelta(days=1)
         building = Building.objects.get(pk=data['building'])
 
         # update user address
@@ -64,7 +60,7 @@ class CheckoutView(LoginRequiredMixin, JSONResponseMixin, FormView):
         # create order
         order = Order(creator=self.request.user, location=location,
                       building=building, meal_type=meal_type,
-                      deliver_time=deliver_time, deliver_date=tomorrow)
+                      deliver_time=deliver_time)
         order.save()
         total_price = 0
         total_amount = 0
@@ -81,6 +77,9 @@ class CheckoutView(LoginRequiredMixin, JSONResponseMixin, FormView):
             order_meal.save()
         order.total_price = total_price
         order.total_amount = total_amount
+
+        order.deliver_date = get_tomorrow()
+
         order.save()
 
         # return ajax response here
@@ -100,8 +99,21 @@ class MyOrderView(LoginRequiredMixin, TemplateView):
         Add my orders to the context
         """
         data = super(MyOrderView, self).get_context_data(**kwargs)
-        orders = Order.objects.filter(creator=self.request.user)
-        data.update({'orders': orders})
+        orders = Order.objects.filter(creator=self.request.user)[:15]
+        my_orders = {'tomorrow': [], 'today': [], 'yesterday': []}
+        today = datetime.now().date()
+        for order in orders:
+            interval = (today-order.deliver_date).days
+            if interval == -1:
+                my_orders['tomorrow'].append(order)
+            elif interval == 0:
+                my_orders['today'].append(order)
+            elif interval == 1:
+                my_orders['yesterday'].append(order)
+            else:
+                break
+
+        data.update({'my_orders': my_orders})
         return data
 
 

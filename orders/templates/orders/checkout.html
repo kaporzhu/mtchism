@@ -33,7 +33,7 @@
             </div>
             <br /><br />
             <div class="form-group">
-                <span class="label label-warning">明天({% now "l" %})</span>
+                <span class="label label-warning">明天({{ tomorrow|date:"l" }})</span>
                 <select id="meal-type-select" class="form-control input-sm">
                     {% for type in meal_type_choices %}
                     <option value="{{ type.0 }}">{{ type.1 }}</option>

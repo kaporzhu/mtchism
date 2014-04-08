@@ -36,4 +36,4 @@ def flake8():
     """
     PEP8 check
     """
-    local('flake8 . --statistics --exclude="migrations"')
+    local('flake8 . --statistics --exclude="migrations,doc"')
