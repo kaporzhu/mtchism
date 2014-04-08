@@ -149,6 +149,12 @@ class OrderListView(StaffuserRequiredMixin, ListView):
         # location
         location = self.request.GET.get('location', '')
 
+        # meal type
+        meal_type = self.request.GET.get('meal-type', 'all')
+
+        # deliver time
+        deliver_time = self.request.GET.get('deliver-time', 'all')
+
         # created time
         try:
             created_start = self.request.GET.get('created-start-datetime')
@@ -163,6 +169,7 @@ class OrderListView(StaffuserRequiredMixin, ListView):
             created_end_dt = None
 
         return {'status': status, 'building': building, 'location': location,
+                'meal_type': meal_type, 'deliver_time': deliver_time,
                 'created_start_dt': created_start_dt,
                 'created_end_dt': created_end_dt}
 
@@ -184,6 +191,14 @@ class OrderListView(StaffuserRequiredMixin, ListView):
         else:
             building_Q = Q()
 
+        # meal type
+        meal_type = params['meal_type']
+        meal_type_Q = Q(meal_type=meal_type) if meal_type != 'all' else Q()
+
+        # deliver time
+        deliver_time = params['deliver_time']
+        deliver_time_Q = Q(deliver_time=deliver_time) if deliver_time != 'all' else Q()  # noqa
+
         # location
         location = params['location']
         location_Q = Q(location__icontains=location) if location else Q()
@@ -199,7 +214,8 @@ class OrderListView(StaffuserRequiredMixin, ListView):
         elif end_dt:
             created_time_Q = Q(created_at__lte=end_dt)
 
-        return qs.filter(status_Q, building_Q, location_Q, created_time_Q)
+        return qs.filter(status_Q, building_Q, meal_type_Q, deliver_time_Q,
+                         location_Q, created_time_Q)
 
     def get_context_data(self, **kwargs):
         """
@@ -207,7 +223,9 @@ class OrderListView(StaffuserRequiredMixin, ListView):
         """
         data = super(OrderListView, self).get_context_data(**kwargs)
         data.update({'status_choices': Order.STATUS_CHOICES,
-                     'buildings': Building.objects.filter(is_active=True)})
+                     'buildings': Building.objects.filter(is_active=True),
+                     'meal_type_choices': Order.MEAL_TYPE_CHOICES,
+                     'deliver_times': json.dumps(DELIVER_TIMES)})
         data.update(self.get_params_from_request())
         return data
 

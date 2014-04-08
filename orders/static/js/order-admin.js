@@ -52,4 +52,29 @@ $(document).ready(function(){
             }
         });
     });
+
+    // meal type change handler
+    $('#meal-type-select').change(function(){
+        update_deliver_times($(this).val());
+    });
+
+    // trigger meal type change when page is loaded
+    $('#meal-type-select').trigger('change');
+
+    // deliver times select
+    function update_deliver_times(meal_type) {
+        var $deliver_times_select = $('#deliver-time-select');
+        $deliver_times_select.children('option:not(.default)').remove();
+        var selected_deliver_time = $deliver_times_select.data('selected-deliver-time');
+        var deliver_times = $deliver_times_select.data('deliver-times');
+        if (deliver_times[meal_type]) {
+            $.each(deliver_times[meal_type], function(index, value){
+                if (selected_deliver_time == value) {
+                    $deliver_times_select.append($('<option>').attr('selected', 'selected').attr('value', value).text(value));
+                } else {
+                    $deliver_times_select.append($('<option>').attr('value', value).text(value));
+                }
+            });
+        }
+    }
 });

@@ -11,7 +11,7 @@ from .factories import OrderFactory
 from accounts.tests.factories import UserFactory
 from buildings.tests.factories import BuildingFactory
 from meals.tests.factories import MealFactory
-from orders.constant import CANCELED, DONE, LUNCH
+from orders.constant import CANCELED, DONE, LUNCH, DELIVER_TIMES, BREAKFAST
 from orders.forms import CheckoutForm
 from orders.models import Order
 from orders.views import(
@@ -139,18 +139,21 @@ class OrderListViewTests(TestCase):
         params = view.get_params_from_request()
         self.assertEqual(params, {'status': 'all', 'building': 'all',
                                   'location': '', 'created_start_dt': None,
-                                  'created_end_dt': None})
+                                  'created_end_dt': None, 'meal_type': 'all',
+                                  'deliver_time': 'all'})
 
         # all params in the request
         now = datetime.now()
         now = datetime(now.year, now.month, now.day, now.hour, now.minute)
         request.GET = {'status': DONE, 'building': 'China', 'location': '110',
                        'created-start-datetime': now.strftime('%m/%d/%Y %H:%M'),  # noqa
-                       'created-end-datetime': now.strftime('%m/%d/%Y %H:%M')}
+                       'created-end-datetime': now.strftime('%m/%d/%Y %H:%M'),
+                       'meal-type': LUNCH, 'deliver-time': '11:00-12:00'}
         params = view.get_params_from_request()
         self.assertEqual(params, {'status': DONE, 'building': 'China',
                                   'location': '110', 'created_start_dt': now,
-                                  'created_end_dt': now})
+                                  'created_end_dt': now, 'meal_type': LUNCH,
+                                  'deliver_time': '11:00-12:00'})
 
     def test_get_queryset(self):
         """
@@ -161,7 +164,9 @@ class OrderListViewTests(TestCase):
         building = BuildingFactory()
         view = OrderListView()
         view.request = request
-        order = OrderFactory(building=building, location='location')
+        order = OrderFactory(building=building, location='location',
+                             meal_type=LUNCH,
+                             deliver_time=DELIVER_TIMES[LUNCH][0])
 
         # without any filter
         qs = view.get_queryset()
@@ -182,6 +187,22 @@ class OrderListViewTests(TestCase):
         qs = view.get_queryset()
         self.assertFalse(qs.filter(id=order.id).exists())
         request.GET = {'location': 'location'}
+        qs = view.get_queryset()
+        self.assertTrue(qs.filter(id=order.id).exists())
+
+        # meal type
+        request.GET = {'meal-type': BREAKFAST}
+        qs = view.get_queryset()
+        self.assertFalse(qs.filter(id=order.id).exists())
+        request.GET = {'meal-type': LUNCH}
+        qs = view.get_queryset()
+        self.assertTrue(qs.filter(id=order.id).exists())
+
+        # deliver time
+        request.GET = {'deliver-time': DELIVER_TIMES[BREAKFAST][0]}
+        qs = view.get_queryset()
+        self.assertFalse(qs.filter(id=order.id).exists())
+        request.GET = {'deliver-time': DELIVER_TIMES[LUNCH][0]}
         qs = view.get_queryset()
         self.assertTrue(qs.filter(id=order.id).exists())
 
@@ -247,7 +268,9 @@ class OrderListViewTests(TestCase):
         self.assertEqual(sorted(view.get_context_data().keys()),
                          sorted(['status_choices', 'status', 'building',
                                  'buildings', 'location', 'created_start_dt',
-                                 'created_end_dt']))
+                                 'created_end_dt', 'deliver_times',
+                                 'deliver_time', 'meal_type_choices',
+                                 'meal_type']))
 
 
 class UpdateOrderStatusViewTests(TestCase):
