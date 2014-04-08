@@ -69,7 +69,7 @@ class CheckoutView(LoginRequiredMixin, JSONResponseMixin, FormView):
             amount = meal_info['amount']
             meal = Meal.objects.get(pk=meal_info['id'])
             # total_price += meal.price * amount
-            total_price += 1.5 * amount
+            total_price += meal.price * amount
             total_amount += amount
             order_meal = OrderMeal(meal=meal,
                                    creator=self.request.user,
