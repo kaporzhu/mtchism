@@ -215,13 +215,18 @@ class OrderListView(StaffuserRequiredMixin, ListView):
         else:
             building_Q = Q()
 
-        # meal type
-        meal_type = params['meal_type']
-        meal_type_Q = Q(meal_type=meal_type) if meal_type != 'all' else Q()
 
         # deliver time
+        meal_type = params['meal_type']
         deliver_time = params['deliver_time']
-        deliver_time_Q = Q(deliver_time=deliver_time) if deliver_time != 'all' else Q()  # noqa
+        if meal_type == BREAKFAST:
+            deliver_time_Q = Q(breakfast_deliver_time=deliver_time) if deliver_time != 'all' else ~Q(breakfast_deliver_time__exact='')  # noqa
+        elif meal_type == LUNCH:
+            deliver_time_Q = Q(lunch_deliver_time=deliver_time) if deliver_time != 'all' else ~Q(lunch_deliver_time__exact='')  # noqa
+        elif meal_type == SUPPER:
+            deliver_time_Q = Q(supper_deliver_time=deliver_time) if deliver_time != 'all' else ~Q(supper_deliver_time__exact='')  # noqa
+        else:
+            deliver_time_Q = Q()
 
         # location
         location = params['location']
@@ -238,8 +243,8 @@ class OrderListView(StaffuserRequiredMixin, ListView):
         elif end_dt:
             created_time_Q = Q(created_at__lte=end_dt)
 
-        return qs.filter(status_Q, building_Q, meal_type_Q, deliver_time_Q,
-                         location_Q, created_time_Q)
+        return qs.filter(status_Q, building_Q, deliver_time_Q, location_Q,
+                         created_time_Q)
 
     def get_context_data(self, **kwargs):
         """

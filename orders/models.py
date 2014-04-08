@@ -7,7 +7,6 @@ from .constant import(
     CREATED, PAID, DONE, CANCELED
 )
 from buildings.models import Building
-from meals.constant import LUNCH
 from meals.models import Meal
 
 

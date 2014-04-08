@@ -10,8 +10,9 @@ import mock
 from .factories import OrderFactory
 from accounts.tests.factories import UserFactory
 from buildings.tests.factories import BuildingFactory
+from meals.constant import BREAKFAST, SUPPER, LUNCH
 from meals.tests.factories import MealFactory
-from orders.constant import CANCELED, DONE, LUNCH, DELIVER_TIMES, BREAKFAST
+from orders.constant import CANCELED, DONE
 from orders.forms import CheckoutForm
 from orders.models import Order
 from orders.views import(
@@ -191,7 +192,8 @@ class OrderListViewTests(TestCase):
         building = BuildingFactory()
         view = OrderListView()
         view.request = request
-        order = OrderFactory(building=building, location='location')
+        order = OrderFactory(building=building, location='location',
+                             lunch_deliver_time='11:30-12:00')
 
         # without any filter
         qs = view.get_queryset()
@@ -215,19 +217,29 @@ class OrderListViewTests(TestCase):
         qs = view.get_queryset()
         self.assertTrue(qs.filter(id=order.id).exists())
 
-        # meal type
-        request.GET = {'meal-type': BREAKFAST}
-        qs = view.get_queryset()
-        self.assertFalse(qs.filter(id=order.id).exists())
-        request.GET = {'meal-type': LUNCH}
+        # deliver time
+        # all meal types
+        request.GET = {'meal-type': 'all', 'deliver-time': 'all'}
         qs = view.get_queryset()
         self.assertTrue(qs.filter(id=order.id).exists())
-
-        # deliver time
-        request.GET = {'deliver-time': DELIVER_TIMES[BREAKFAST][0]}
+        # all lunches
+        request.GET = {'meal-type': LUNCH, 'deliver-time': 'all'}
+        qs = view.get_queryset()
+        self.assertTrue(qs.filter(id=order.id).exists())
+        # supper
+        request.GET = {'meal-type': SUPPER, 'deliver-time': 'all'}
         qs = view.get_queryset()
         self.assertFalse(qs.filter(id=order.id).exists())
-        request.GET = {'deliver-time': DELIVER_TIMES[LUNCH][0]}
+        # breakfast
+        request.GET = {'meal-type': BREAKFAST, 'deliver-time': 'all'}
+        qs = view.get_queryset()
+        self.assertFalse(qs.filter(id=order.id).exists())
+        # not right lunch time
+        request.GET = {'meal-type': LUNCH, 'deliver-time': 'time'}
+        qs = view.get_queryset()
+        self.assertFalse(qs.filter(id=order.id).exists())
+        # right lunch
+        request.GET = {'meal-type': LUNCH, 'deliver-time': '11:30-12:00'}
         qs = view.get_queryset()
         self.assertTrue(qs.filter(id=order.id).exists())
 

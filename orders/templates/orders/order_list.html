@@ -123,12 +123,27 @@
                     <td>
                         <ul class="list-unstyled">
                             {% for ordermeal in order.ordermeal_set.all %}
-                            <li>{{ ordermeal.meal.name }} x {{ ordermeal.amount }}</li>
+                            <li>{{ ordermeal.meal.name }} x {{ ordermeal.amount }}<small>({{ ordermeal.get_meal_type_display }})</small></li>
                             {% endfor %}
                         </ul>
                     </td>
                     <td>{{ order.total_amount }}</td>
-                    <td>{{ order.deliver_date|date:"n月j日" }} {{ order.get_meal_type_display }} {{ order.deliver_time }}</td>
+                    <td>
+                        {{ order.deliver_date|date:"n月j日" }}
+                        <small>
+                            <ul class="list-unstyled">
+                                {% if order.breakfast_deliver_time %}
+                                <li>早餐：{{ order.breakfast_deliver_time }}</li>
+                                {% endif %}
+                                {% if order.lunch_deliver_time %}
+                                <li>午餐：{{ order.lunch_deliver_time }}</li>
+                                {% endif %}
+                                {% if order.supper_deliver_time %}
+                                <li>晚餐：{{ order.supper_deliver_time }}</li>
+                                {% endif %}
+                            </ul>
+                        </small>
+                    </td>
                     <td>{{ order.total_price }}</td>
                     <td>{{ order.building.name }}, {{ order.location }}</td>
                     <td class="status">
