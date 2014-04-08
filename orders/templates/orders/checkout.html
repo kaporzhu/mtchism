@@ -19,7 +19,7 @@
     <div class="col-md-12">
         <form class="form-inline" role="form">
             <div class="form-group">
-                <span>配送地址：</span>
+                <span>送餐地址：</span>
                 <select id="building" class="form-control input-sm">
                     {% for building in buildings %}
                         {% if user.profile.building == building %}
@@ -30,6 +30,19 @@
                     {% endfor %}
                 </select>
                 <input type="text" id="location" class="form-control input-sm" value="{{ user.profile.location|default_if_none:'' }}" placeholder="请尽可能详细。如A座三单元1005-2 B区02" />
+            </div>
+            <br /><br />
+            <div class="form-group">
+                <span class="label label-warning">明天({{ tomorrow|date:"l" }})</span>
+                <select id="meal-type-select" class="form-control input-sm">
+                    {% for type in meal_type_choices %}
+                    <option value="{{ type.0 }}">{{ type.1 }}</option>
+                    {% endfor %}
+                </select>
+                <select id="deliver-time-select" class="form-control input-sm" data-deliver-times="{{ deliver_times }}" data-preferred-lunch-time="{{ user.profile.preferred_lunch_time }}"  data-preferred-supper-time="{{ user.profile.preferred_supper_time|default_if_none:'' }}" data-preferred-breakfast-time="{{ user.profile.preferred_breakfast_time|default_if_none:'' }}">
+                    <option class="default" selected="selected" value="">选择您最适合的用餐时间</option>
+                </select>
+                <small>按时吃饭是大事，我们确保准时送到。只能帮到这了。</small>
             </div>
         </form>
         <hr />

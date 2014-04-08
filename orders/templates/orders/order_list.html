@@ -34,6 +34,23 @@
             </div>
             <br /><br />
             <div class="form-group">
+                <span>套餐：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                <select id="meal-type-select" name="meal-type" class="form-control">
+                    <option value="all" class="default">所有套餐</option>
+                    {% for choice in meal_type_choices %}
+                        {% if choice.0 == meal_type %}
+                        <option value="{{ choice.0 }}" selected="selected">{{ choice.1 }}</option>
+                        {% else %}
+                        <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+                <select name="deliver-time" id="deliver-time-select" class="form-control" data-selected-deliver-time="{{ deliver_time }}" data-deliver-times="{{ deliver_times }}">
+                    <option value="all" class="default">所有时段</option>
+                </select>
+            </div>
+            <br /><br />
+            <div class="form-group">
                 <span>写字楼：&nbsp;&nbsp;&nbsp;</span>
                 <select name="building" class="form-control">
                     <option value="all">所有写字楼</option>
@@ -56,14 +73,6 @@
                 <label> - </label>
                 <input type="text" class="form-control datetime" value="{{ created_end_dt|date:'m/d/Y H:i' }}" name="created-end-datetime" />
             </div>
-            <br /><br />
-            <div class="form-group">
-                <span>配送时间：</span>
-                <input type="text" class="form-control datetime" name="deliver-start-datetime" />
-                <label> - </label>
-                <input type="text" class="form-control datetime" name="deliver-end-datetime" />
-            </div>
-            <br /><br />
             <button type="submit" class="btn btn-primary">查找</button>
         </form>
         <hr />
@@ -99,7 +108,7 @@
                     <th>选取</th>
                     <th>套餐</th>
                     <th>数量(份)</th>
-                    <th>下单时间</th>
+                    <th>配送时间</th>
                     <th>总价</th>
                     <th>配送地址</th>
                     <th>状态</th>
@@ -119,7 +128,7 @@
                         </ul>
                     </td>
                     <td>{{ order.total_amount }}</td>
-                    <td>{{ order.created_at|date:"n月j日" }}</td>
+                    <td>{{ order.deliver_date|date:"n月j日" }} {{ order.get_meal_type_display }} {{ order.deliver_time }}</td>
                     <td>{{ order.total_price }}</td>
                     <td>{{ order.building.name }}, {{ order.location }}</td>
                     <td class="status">

@@ -7,6 +7,10 @@ table tr.selected td {
     background-color: #FFFFCC;
 }
 
+small {
+    color: #999;
+}
+
 .highlight {
     background-color: yellow;
 }

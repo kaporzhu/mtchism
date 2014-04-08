@@ -11,6 +11,8 @@ class CheckoutForm(forms.Form):
     building = forms.CharField(widget=forms.HiddenInput)
     location = forms.CharField(widget=forms.HiddenInput)
     meals = forms.CharField(widget=forms.HiddenInput)
+    deliver_time = forms.CharField(widget=forms.HiddenInput)
+    meal_type = forms.CharField(widget=forms.HiddenInput)
 
     def clean_meals(self):
         """

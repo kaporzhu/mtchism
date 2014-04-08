@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 from datetime import datetime
 
 from django.core.urlresolvers import reverse
@@ -14,9 +15,10 @@ from braces.views import(
     AjaxResponseMixin
 )
 
-from .constant import CANCELED
+from .constant import CANCELED, DELIVER_TIMES
 from .forms import CheckoutForm
 from .models import Order, OrderMeal
+from .utils import get_tomorrow
 from buildings.models import Building
 from meals.models import Meal
 
@@ -33,7 +35,10 @@ class CheckoutView(LoginRequiredMixin, JSONResponseMixin, FormView):
         Add buildings to context
         """
         data = super(CheckoutView, self).get_context_data(**kwargs)
-        data.update({'buildings': Building.objects.filter(is_active=True)})
+        data.update({'buildings': Building.objects.filter(is_active=True),
+                     'deliver_times': json.dumps(DELIVER_TIMES),
+                     'meal_type_choices': Order.MEAL_TYPE_CHOICES,
+                     'tomorrow': get_tomorrow()})
         return data
 
     def form_valid(self, form):
@@ -42,17 +47,21 @@ class CheckoutView(LoginRequiredMixin, JSONResponseMixin, FormView):
         """
         data = form.cleaned_data
         location = data['location']
+        meal_type = data['meal_type']
+        deliver_time = data['deliver_time']
         building = Building.objects.get(pk=data['building'])
 
-        # update user address
+        # update user address and preferred time
         profile = self.request.user.profile
         profile.building = building
         profile.location = location
+        setattr(profile, 'preferred_{}_time'.format(meal_type), deliver_time)
         profile.save()
 
         # create order
         order = Order(creator=self.request.user, location=location,
-                      building=building)
+                      building=building, meal_type=meal_type,
+                      deliver_time=deliver_time)
         order.save()
         total_price = 0
         total_amount = 0
@@ -69,6 +78,9 @@ class CheckoutView(LoginRequiredMixin, JSONResponseMixin, FormView):
             order_meal.save()
         order.total_price = total_price
         order.total_amount = total_amount
+
+        order.deliver_date = get_tomorrow()
+
         order.save()
 
         # return ajax response here
@@ -88,8 +100,21 @@ class MyOrderView(LoginRequiredMixin, TemplateView):
         Add my orders to the context
         """
         data = super(MyOrderView, self).get_context_data(**kwargs)
-        orders = Order.objects.filter(creator=self.request.user)
-        data.update({'orders': orders})
+        orders = Order.objects.filter(creator=self.request.user)[:15]
+        my_orders = {'tomorrow': [], 'today': [], 'yesterday': []}
+        today = datetime.now().date()
+        for order in orders:
+            interval = (today-order.deliver_date).days
+            if interval == -1:
+                my_orders['tomorrow'].append(order)
+            elif interval == 0:
+                my_orders['today'].append(order)
+            elif interval == 1:
+                my_orders['yesterday'].append(order)
+            else:
+                break
+
+        data.update({'my_orders': my_orders})
         return data
 
 
@@ -137,6 +162,12 @@ class OrderListView(StaffuserRequiredMixin, ListView):
         # location
         location = self.request.GET.get('location', '')
 
+        # meal type
+        meal_type = self.request.GET.get('meal-type', 'all')
+
+        # deliver time
+        deliver_time = self.request.GET.get('deliver-time', 'all')
+
         # created time
         try:
             created_start = self.request.GET.get('created-start-datetime')
@@ -151,6 +182,7 @@ class OrderListView(StaffuserRequiredMixin, ListView):
             created_end_dt = None
 
         return {'status': status, 'building': building, 'location': location,
+                'meal_type': meal_type, 'deliver_time': deliver_time,
                 'created_start_dt': created_start_dt,
                 'created_end_dt': created_end_dt}
 
@@ -172,6 +204,14 @@ class OrderListView(StaffuserRequiredMixin, ListView):
         else:
             building_Q = Q()
 
+        # meal type
+        meal_type = params['meal_type']
+        meal_type_Q = Q(meal_type=meal_type) if meal_type != 'all' else Q()
+
+        # deliver time
+        deliver_time = params['deliver_time']
+        deliver_time_Q = Q(deliver_time=deliver_time) if deliver_time != 'all' else Q()  # noqa
+
         # location
         location = params['location']
         location_Q = Q(location__icontains=location) if location else Q()
@@ -187,7 +227,8 @@ class OrderListView(StaffuserRequiredMixin, ListView):
         elif end_dt:
             created_time_Q = Q(created_at__lte=end_dt)
 
-        return qs.filter(status_Q, building_Q, location_Q, created_time_Q)
+        return qs.filter(status_Q, building_Q, meal_type_Q, deliver_time_Q,
+                         location_Q, created_time_Q)
 
     def get_context_data(self, **kwargs):
         """
@@ -195,7 +236,9 @@ class OrderListView(StaffuserRequiredMixin, ListView):
         """
         data = super(OrderListView, self).get_context_data(**kwargs)
         data.update({'status_choices': Order.STATUS_CHOICES,
-                     'buildings': Building.objects.filter(is_active=True)})
+                     'buildings': Building.objects.filter(is_active=True),
+                     'meal_type_choices': Order.MEAL_TYPE_CHOICES,
+                     'deliver_times': json.dumps(DELIVER_TIMES)})
         data.update(self.get_params_from_request())
         return data
 

@@ -40,6 +40,8 @@ $(document).ready(function(){
         var meals = get_meals().meals;
         var building = $('#building').val();
         var location = $('#location').val();
+        var meal_type = $('#meal-type-select').val();
+        var deliver_time = $('#deliver-time-select').val();
 
         if (location.length < 5) {
             alert('地址不够具体，我们的配送小哥会抓狂的。');
@@ -55,6 +57,8 @@ $(document).ready(function(){
                 meals: JSON.stringify(meals),
                 building: building,
                 location: location,
+                meal_type: meal_type,
+                deliver_time: deliver_time,
                 csrfmiddlewaretoken: get_cookie('csrftoken')
             },
             success: function(result) {
@@ -64,4 +68,27 @@ $(document).ready(function(){
             }
         });
     });
+
+    // meal type change handler
+    $('#meal-type-select').change(function(){
+        update_deliver_times($(this).val());
+    });
+
+    // trigger meal type change when page is loaded
+    $('#meal-type-select').trigger('change');
+
+    // deliver times select
+    function update_deliver_times(meal_type) {
+        var $deliver_times_select = $('#deliver-time-select');
+        var perferred_time = $deliver_times_select.data('preferred-'+meal_type+'-time');
+        $deliver_times_select.children('option:not(.default)').remove();
+        var deliver_times = $deliver_times_select.data('deliver-times');
+        $.each(deliver_times[meal_type], function(index, value){
+            if (perferred_time == value) {
+                $deliver_times_select.append($('<option>').attr('selected', 'selected').attr('value', value).text(value));
+            } else {
+                $deliver_times_select.append($('<option>').attr('value', value).text(value));
+            }
+        });
+    }
 });
