@@ -7,6 +7,7 @@
 <div class="row">
     <form method="post" enctype="multipart/form-data" class="form-inline col-md-12" role="form">
         {% csrf_token %}
+        {{ form.errors }}
         {% for field in form %}
             <div class="form-group">
                 <label class="sr-only">{{ field.label }}</label>

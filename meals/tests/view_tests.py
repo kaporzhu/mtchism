@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.http.request import QueryDict
 from django.test.client import RequestFactory
 from django.test.testcases import TestCase
 
@@ -10,7 +11,8 @@ from foods.tests.factories import FoodFactory
 from meals.forms import MealForm, DishForm, UpdateDishFoodsForm
 from meals.models import Meal, Dish, DishFood
 from meals.views import(
-    CreateMealView, CreateDishView, UpdateDishFoodsView, MealIndexView
+    CreateMealView, CreateDishView, UpdateDishFoodsView, MealIndexView,
+    UpdateMealView
 )
 
 
@@ -38,7 +40,7 @@ class CreateMealViewTests(TestCase):
         view.request = request
 
         # create form
-        form = MealForm({'name': 'Meal name'})
+        form = MealForm(QueryDict('name=Meal name&price=10&limitations=lunch'))
 
         # test now
         view.form_valid(form)
@@ -200,3 +202,40 @@ class MealIndexViewTests(TestCase):
         view = MealIndexView()
         data = view.get_context_data()
         self.assertTrue('meals' in data)
+
+
+class UpdateMealViewTests(TestCase):
+    """
+    Tests for UpdateMealView
+    """
+    def _fake_get_form_kwargs_with_empty_limitations(self):
+        """
+        Return dict with empty limitations
+        """
+        return {'instance': MealFactory.build(limitations='')}
+
+    @mock.patch('django.views.generic.edit.UpdateView.get_form_kwargs',
+                _fake_get_form_kwargs_with_empty_limitations)
+    def test_get_form_kwargs1(self):
+        """
+        Check if the limitations is updated
+        """
+        view = UpdateMealView()
+        kwargs = view.get_form_kwargs()
+        self.assertEqual(kwargs['instance'].limitations, [])
+
+    def _fake_get_form_kwargs_with_limitations(self):
+        """
+        Return dict with empty limitations
+        """
+        return {'instance': MealFactory.build(limitations='["lunch"]')}
+
+    @mock.patch('django.views.generic.edit.UpdateView.get_form_kwargs',
+                _fake_get_form_kwargs_with_limitations)
+    def test_get_form_kwargs2(self):
+        """
+        Check if the limitations is updated
+        """
+        view = UpdateMealView()
+        kwargs = view.get_form_kwargs()
+        self.assertEqual(kwargs['instance'].limitations, ['lunch'])

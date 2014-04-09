@@ -17,7 +17,7 @@
                 {% for meal in object_list %}
                 <tr>
                     <td>
-                        {{ meal.name }}({{ meal.price }})
+                        {{ meal.name }}({{ meal.price }})<small>[{{ meal.get_limitations_display }}]</small>
                         <a href="{% url 'meals:update' pk=meal.id %}">
                             <span class="glyphicon glyphicon-pencil"></span>
                         </a>

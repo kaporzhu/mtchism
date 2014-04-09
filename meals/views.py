@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import json
+
 from django.core.urlresolvers import reverse_lazy
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView, UpdateView, FormView
@@ -40,6 +42,18 @@ class UpdateMealView(StaffuserRequiredMixin, SetHeadlineMixin, UpdateView):
     form_class = MealForm
     headline = '修改套餐名'
     success_url = reverse_lazy('meals:list')
+
+    def get_form_kwargs(self):
+        """
+        Convert limitation to a string
+        """
+        kwargs = super(UpdateMealView, self).get_form_kwargs()
+        if kwargs['instance'].limitations:
+            limitations = json.loads(kwargs['instance'].limitations)
+        else:
+            limitations = []
+        kwargs['instance'].limitations = limitations
+        return kwargs
 
 
 class MealListView(StaffuserRequiredMixin, ListView):
@@ -151,5 +165,6 @@ class MealIndexView(TemplateView):
         Add extra data to context
         """
         data = super(MealIndexView, self).get_context_data(**kwargs)
-        data.update({'meals': Meal.objects.all()})
+        data.update({'meals': Meal.objects.all(),
+                     'meal_types': Meal.MEAL_TYPES})
         return data

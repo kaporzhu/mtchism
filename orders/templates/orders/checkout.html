@@ -16,6 +16,51 @@
 
 <div class="row">
 
+    <div class="col-md-12" id="selected_meals">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th class="col-md-6">套餐名</th>
+                    <th></th>
+                    <th>单价</th>
+                    <th>数量</th>
+                    <th>小计</th>
+                </tr>
+            </thead>
+            <tbody id="selected-meals">
+            </tbody>
+        </table>
+        {% verbatim %}
+        <script id='selected-meal-template' type='text/ractive'>
+            {{#meals}}
+            <tr id="meal-{{id}}">
+                <td>{{name}}</td>
+                <td class="meal-type alert-warning">
+                    {{#limitations}}
+                    <label class="radio-inline">
+                        <input type="radio" class="meal-type-checkbox" name="meal-type-{{id}}" value="{{type}}"> {{label}}
+                    </label>
+                    {{/limitations}}
+                </td>
+                <td>{{price}}</td>
+                <td>
+                    <span>{{amount}}</span>
+                    <div class="pull-right">
+                        <a href="javascript:void(0)" data-id="{{id}}" class="plus-meal"><span class="glyphicon glyphicon-plus"></span></a>
+                        <a href="javascript:void(0)" data-id="{{id}}" class="minus-meal"><span class="glyphicon glyphicon-minus"></span></a>
+                    </div>
+                </td>
+                <td>{{subtotal}}</td>
+            </tr>
+            {{/meals}}
+            {{#total}}
+            <tr class="text-right">
+                <td colspan="5">您一共选择了<b>{{amount}}</b>份套餐，总计<b>{{price}}</b>元</td>
+            </tr>
+            {{/total}}
+        </script>
+        {% endverbatim %}
+    </div>
     <div class="col-md-12">
         <form class="form-inline" role="form">
             <div class="form-group">
@@ -33,56 +78,30 @@
             </div>
             <br /><br />
             <div class="form-group">
+                <span>送餐时间：</span>
                 <span class="label label-warning">明天({{ tomorrow|date:"l" }})</span>
-                <select id="meal-type-select" class="form-control input-sm">
-                    {% for type in meal_type_choices %}
-                    <option value="{{ type.0 }}">{{ type.1 }}</option>
-                    {% endfor %}
-                </select>
-                <select id="deliver-time-select" class="form-control input-sm" data-deliver-times="{{ deliver_times }}" data-preferred-lunch-time="{{ user.profile.preferred_lunch_time }}"  data-preferred-supper-time="{{ user.profile.preferred_supper_time|default_if_none:'' }}" data-preferred-breakfast-time="{{ user.profile.preferred_breakfast_time|default_if_none:'' }}">
-                    <option class="default" selected="selected" value="">选择您最适合的用餐时间</option>
-                </select>
-                <small>按时吃饭是大事，我们确保准时送到。只能帮到这了。</small>
+                {% for type, times in deliver_times.items %}
+                    <span id="{{ type }}-deliver-time-select">
+                        {% for meal_type in meal_type_choices %}
+                            {% if meal_type.0 == type %}
+                            <span>{{ meal_type.1 }}</span>
+                            {% endif %}
+                        {% endfor %}
+                        <select class="form-control input-sm">
+                            {% for time in times %}
+                                {% if time == user.profile.preferred_breakfast_time or time == user.profile.preferred_lunch_time or time == user.profile.preferred_supper_time %}
+                                <option selected="selected" value="{{ time }}">{{ time }}</option>
+                                {% else %}
+                                <option value="{{ time }}">{{ time }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </span>
+                {% endfor %}
+                <br />
+                <small>* 按时吃饭是大事，我们确保准时送到。只能帮到这了。</small>
             </div>
         </form>
-        <hr />
-    </div>
-    <div class="col-md-12" id="selected_meals">
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th class="col-md-8">套餐名</th>
-                    <th>单价</th>
-                    <th>数量</th>
-                    <th>小计</th>
-                </tr>
-            </thead>
-            <tbody id="selected-meals">
-            </tbody>
-        </table>
-        {% verbatim %}
-        <script id='selected-meal-template' type='text/ractive'>
-            {{#meals}}
-            <tr>
-                <td>{{name}}</td>
-                <td>{{price}}</td>
-                <td>
-                    <span>{{amount}}</span>
-                    <div class="pull-right">
-                        <a href="javascript:void(0)" data-id="{{id}}" class="plus-meal"><span class="glyphicon glyphicon-plus"></span></a>
-                        <a href="javascript:void(0)" data-id="{{id}}" class="minus-meal"><span class="glyphicon glyphicon-minus"></span></a>
-                    </div>
-                </td>
-                <td>{{subtotal}}</td>
-            </tr>
-            {{/meals}}
-            {{#total}}
-            <tr class="text-right">
-                <td colspan=4>您一共选择了<b>{{amount}}</b>份套餐，总计<b>{{price}}</b>元</td>
-            </tr>
-            {{/total}}
-        </script>
-        {% endverbatim %}
     </div>
 
     <form method="post" class="form-inline col-md-12 text-right" role="form">

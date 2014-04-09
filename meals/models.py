@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
+import json
+
 from django.contrib.auth.models import User
 from django.db import models
 
+from .constant import LUNCH, BREAKFAST, SUPPER
 from foods.models import Food
 
 
@@ -57,9 +60,45 @@ class Meal(models.Model):
     """
     Each meal in a day.
     """
+    MEAL_TYPE_CHOICES = (
+        (BREAKFAST, u'早餐'),
+        (LUNCH, u'午餐'),
+        (SUPPER, u'晚餐'),
+    )
+
+    MEAL_TYPES = {
+        BREAKFAST: u'早餐',
+        LUNCH: u'午餐',
+        SUPPER: u'晚餐',
+    }
+
     name = models.CharField(max_length=128)
     dishes = models.ManyToManyField(Dish)
     price = models.FloatField(default=0)
+    # breakfast, lunch, supper. Seperate with comma
+    limitations = models.CharField(max_length=64, blank=True)
 
     creator = models.ForeignKey(User)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def get_limitations(self):
+        """
+        Get limitations in dict
+        """
+        limitations = []
+        for limit in json.loads(self.limitations):
+            if limit in self.MEAL_TYPES:
+                limitations.append({'type': limit,
+                                    'label': self.MEAL_TYPES[limit]})
+        return json.dumps(limitations)
+
+    def get_limitations_display(self):
+        """
+        Get limitation label
+        """
+        limitations = []
+        if self.limitations:
+            for limit in json.loads(self.limitations):
+                if limit in self.MEAL_TYPES:
+                    limitations.append(self.MEAL_TYPES[limit])
+        return ','.join(limitations)

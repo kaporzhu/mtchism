@@ -4,7 +4,7 @@ param id: meal id
 param name: meal name
 param price: meal price
 */
-function add_meal(id, name, price) {
+function add_meal(id, name, price, limitations) {
     var meals = JSON.parse(localStorage.meals ? localStorage.meals : '[]');
 
     // check if the meal is in the cart
@@ -22,7 +22,8 @@ function add_meal(id, name, price) {
             id : id,
             amount : 1,
             price : price,
-            name : name
+            name : name,
+            limitations: limitations
         });
     }
     localStorage.meals = JSON.stringify(meals);

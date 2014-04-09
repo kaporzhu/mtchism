@@ -12,14 +12,22 @@ class MealForm(forms.ModelForm):
     """
     class Meta:
         model = Meal
-        fields = ('name', 'price', )
+        fields = ('name', 'price', 'limitations')
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control',
-                                           'placeholder': '套餐名'}),
-            'price': forms.TextInput(attrs={'type': 'number',
-                                            'class': 'form-control',
-                                           'placeholder': '价格'})
+            'name': forms.TextInput(
+                attrs={'class': 'form-control', 'placeholder': '套餐名'}),
+            'price': forms.TextInput(
+                attrs={'type': 'number', 'class': 'form-control'}),
+            'limitations': forms.CheckboxSelectMultiple(
+                attrs={'class': 'form-control'},
+                choices=Meal.MEAL_TYPE_CHOICES)
         }
+
+    def clean_limitations(self):
+        """
+        Convert limitations to JSON string
+        """
+        return json.dumps(self.data.getlist('limitations'))
 
 
 class DishForm(forms.ModelForm):

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import collections
 import json
 from datetime import datetime
 
@@ -20,6 +21,7 @@ from .forms import CheckoutForm
 from .models import Order, OrderMeal
 from .utils import get_tomorrow
 from buildings.models import Building
+from meals.constant import BREAKFAST, SUPPER, LUNCH
 from meals.models import Meal
 
 
@@ -36,8 +38,8 @@ class CheckoutView(LoginRequiredMixin, JSONResponseMixin, FormView):
         """
         data = super(CheckoutView, self).get_context_data(**kwargs)
         data.update({'buildings': Building.objects.filter(is_active=True),
-                     'deliver_times': json.dumps(DELIVER_TIMES),
-                     'meal_type_choices': Order.MEAL_TYPE_CHOICES,
+                     'deliver_times': collections.OrderedDict(sorted(DELIVER_TIMES.items())),  # noqa
+                     'meal_type_choices': Meal.MEAL_TYPE_CHOICES,
                      'tomorrow': get_tomorrow()})
         return data
 
@@ -47,34 +49,44 @@ class CheckoutView(LoginRequiredMixin, JSONResponseMixin, FormView):
         """
         data = form.cleaned_data
         location = data['location']
-        meal_type = data['meal_type']
-        deliver_time = data['deliver_time']
+        deliver_times = {
+            BREAKFAST: data.get('breakfast_deliver_time'),
+            LUNCH: data.get('lunch_deliver_time'),
+            SUPPER: data.get('supper_deliver_time'),
+        }
         building = Building.objects.get(pk=data['building'])
 
         # update user address and preferred time
         profile = self.request.user.profile
         profile.building = building
         profile.location = location
-        setattr(profile, 'preferred_{}_time'.format(meal_type), deliver_time)
+        for tp, time in deliver_times.iteritems():
+            if time:
+                setattr(profile, 'preferred_{}_time'.format(tp), time)
         profile.save()
 
         # create order
         order = Order(creator=self.request.user, location=location,
-                      building=building, meal_type=meal_type,
-                      deliver_time=deliver_time)
+                      building=building,
+                      breakfast_deliver_time=deliver_times[BREAKFAST],
+                      lunch_deliver_time=deliver_times[LUNCH],
+                      supper_deliver_time=deliver_times[SUPPER])
         order.save()
         total_price = 0
         total_amount = 0
         for meal_info in data['meals']:
             amount = meal_info['amount']
             meal = Meal.objects.get(pk=meal_info['id'])
-            # total_price += meal.price * amount
+            deliver_time = deliver_times[meal_info['meal_type']]
             total_price += meal.price * amount
             total_amount += amount
             order_meal = OrderMeal(meal=meal,
                                    creator=self.request.user,
                                    order=order,
-                                   amount=meal_info['amount'])
+                                   amount=meal_info['amount'],
+                                   meal_type=meal_info['meal_type'],
+                                   deliver_time=deliver_time
+                                   )
             order_meal.save()
         order.total_price = total_price
         order.total_amount = total_amount
@@ -204,13 +216,18 @@ class OrderListView(StaffuserRequiredMixin, ListView):
         else:
             building_Q = Q()
 
-        # meal type
-        meal_type = params['meal_type']
-        meal_type_Q = Q(meal_type=meal_type) if meal_type != 'all' else Q()
 
         # deliver time
+        meal_type = params['meal_type']
         deliver_time = params['deliver_time']
-        deliver_time_Q = Q(deliver_time=deliver_time) if deliver_time != 'all' else Q()  # noqa
+        if meal_type == BREAKFAST:
+            deliver_time_Q = Q(breakfast_deliver_time=deliver_time) if deliver_time != 'all' else ~Q(breakfast_deliver_time__exact='')  # noqa
+        elif meal_type == LUNCH:
+            deliver_time_Q = Q(lunch_deliver_time=deliver_time) if deliver_time != 'all' else ~Q(lunch_deliver_time__exact='')  # noqa
+        elif meal_type == SUPPER:
+            deliver_time_Q = Q(supper_deliver_time=deliver_time) if deliver_time != 'all' else ~Q(supper_deliver_time__exact='')  # noqa
+        else:
+            deliver_time_Q = Q()
 
         # location
         location = params['location']
@@ -227,8 +244,8 @@ class OrderListView(StaffuserRequiredMixin, ListView):
         elif end_dt:
             created_time_Q = Q(created_at__lte=end_dt)
 
-        return qs.filter(status_Q, building_Q, meal_type_Q, deliver_time_Q,
-                         location_Q, created_time_Q)
+        return qs.filter(status_Q, building_Q, deliver_time_Q, location_Q,
+                         created_time_Q)
 
     def get_context_data(self, **kwargs):
         """
@@ -237,7 +254,7 @@ class OrderListView(StaffuserRequiredMixin, ListView):
         data = super(OrderListView, self).get_context_data(**kwargs)
         data.update({'status_choices': Order.STATUS_CHOICES,
                      'buildings': Building.objects.filter(is_active=True),
-                     'meal_type_choices': Order.MEAL_TYPE_CHOICES,
+                     'meal_type_choices': Meal.MEAL_TYPE_CHOICES,
                      'deliver_times': json.dumps(DELIVER_TIMES)})
         data.update(self.get_params_from_request())
         return data
