@@ -10,7 +10,10 @@ $(document).ready(function(){
         var ractive = new Ractive({
             el: 'selected-meals',
             template: '#selected-meal-template',
-            data: meals
+            data: meals,
+            complete: function() {
+                update_deliver_time_selector();
+            }
         });
     }
     load_meals();
@@ -36,9 +39,37 @@ $(document).ready(function(){
     });
 
     // remove meal type checkbox not checked wanring
-    $('.meal-type-checkbox').change(function(){
+    $('.meal-type').change(function(){
         $(this).parents('td').removeClass('alert-danger');
+        update_deliver_time_selector();
     });
+
+    // hide or show deliver time selectors
+    function update_deliver_time_selector() {
+        var time_selector = {
+            breakfast: false,
+            lunch: false,
+            supper: false
+        };
+        $('#selected-meals .meal-type').each(function(){
+            var $checked_input = $(this).find('input:checked');
+            if ($checked_input.size() > 0) {
+                time_selector[$checked_input.val()] = true;
+            } else {
+                $(this).find('input').each(function(){
+                    time_selector[$(this).val()] = true;
+                });
+            }
+        });
+
+        for (var type in time_selector) {
+            if (!time_selector[type]) {
+                $('#{type}-deliver-time-select'.replace('{type}', type)).addClass('hidden');
+            } else {
+                $('#{type}-deliver-time-select'.replace('{type}', type)).removeClass('hidden');
+            }
+        }
+    }
 
     // create order
     $('#create-order-btn').click(function(){
@@ -93,34 +124,4 @@ $(document).ready(function(){
             }
         });
     });
-
-    // check all selected meals, hide breakfast deliver time selector if there's not breakfast food
-    function update_deliver_time_selector() {
-        var meals = get_meals().meals;
-        var time_selector = {
-            breakfast: false,
-            lunch: false,
-            supper: false
-        };
-        var breakfast = false, lunch = false; supper = false;
-        for (var i=0; i<meals.length; i++) {
-            var limitations = meals[i].limitations;
-            for (var j=0; j<limitations.length; j++) {
-                for (var type in time_selector) {
-                    if (type == limitations[j].type) {
-                        time_selector[type] = true;
-                    }
-                }
-            }
-        }
-
-        for (var type in time_selector) {
-            if (!time_selector[type]) {
-                $('#{type}-deliver-time-select'.replace('{type}', type)).addClass('hidden');
-            } else {
-                $('#{type}-deliver-time-select'.replace('{type}', type)).removeClass('hidden');
-            }
-        }
-    }
-    update_deliver_time_selector();
 });

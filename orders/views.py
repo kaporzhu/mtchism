@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import collections
 import json
 from datetime import datetime
 
@@ -37,7 +38,7 @@ class CheckoutView(LoginRequiredMixin, JSONResponseMixin, FormView):
         """
         data = super(CheckoutView, self).get_context_data(**kwargs)
         data.update({'buildings': Building.objects.filter(is_active=True),
-                     'deliver_times': DELIVER_TIMES,
+                     'deliver_times': collections.OrderedDict(sorted(DELIVER_TIMES.items())),  # noqa
                      'meal_type_choices': Meal.MEAL_TYPE_CHOICES,
                      'tomorrow': get_tomorrow()})
         return data

@@ -15,16 +15,28 @@
                 </tr>
                 {% for order in my_orders.tomorrow %}
                 <tr>
-                    <td>{{ order.get_meal_type_display }} {{ order.deliver_time }}</td>
                     <td>
                         <ul class="list-unstyled">
                             {% for ordermeal in order.ordermeal_set.all %}
-                            <li>{{ ordermeal.meal.name }} x {{ ordermeal.amount }}</li>
+                            <li>{{ ordermeal.meal.name }} x {{ ordermeal.amount }}<small>({{ ordermeal.get_meal_type_display }})</small></li>
                             {% endfor %}
                         </ul>
                     </td>
                     <td>{{ order.total_price }}元</td>
                     <td>{{ order.building.name }}, {{ order.location }}</td>
+                    <td>
+                        <ul class="list-unstyled">
+                            {% if order.breakfast_deliver_time %}
+                            <li>早餐：{{ order.breakfast_deliver_time }}</li>
+                            {% endif %}
+                            {% if order.lunch_deliver_time %}
+                            <li>午餐：{{ order.lunch_deliver_time }}</li>
+                            {% endif %}
+                            {% if order.supper_deliver_time %}
+                            <li>晚餐：{{ order.supper_deliver_time }}</li>
+                            {% endif %}
+                        </ul>
+                    </td>
                     <td>
                         {{ order.get_status_display }}
                         {{ order.get_operation_buttons|default_if_none:''|safe }}
@@ -39,7 +51,6 @@
                 </tr>
                 {% for order in my_orders.today %}
                 <tr>
-                    <td>{{ order.get_meal_type_display }} {{ order.deliver_time }}</td>
                     <td>
                         <ul class="list-unstyled">
                             {% for ordermeal in order.ordermeal_set.all %}
@@ -49,6 +60,19 @@
                     </td>
                     <td>{{ order.total_price }}元</td>
                     <td>{{ order.building.name }}, {{ order.location }}</td>
+                    <td>
+                        <ul class="list-unstyled">
+                            {% if order.breakfast_deliver_time %}
+                            <li>早餐：{{ order.breakfast_deliver_time }}</li>
+                            {% endif %}
+                            {% if order.lunch_deliver_time %}
+                            <li>午餐：{{ order.lunch_deliver_time }}</li>
+                            {% endif %}
+                            {% if order.supper_deliver_time %}
+                            <li>晚餐：{{ order.supper_deliver_time }}</li>
+                            {% endif %}
+                        </ul>
+                    </td>
                     <td>
                         {{ order.get_status_display }}
                         {{ order.get_operation_buttons|default_if_none:''|safe }}
@@ -63,7 +87,6 @@
                 </tr>
                 {% for order in my_orders.yesterday %}
                 <tr>
-                    <td>{{ order.get_meal_type_display }} {{ order.deliver_time }}</td>
                     <td>
                         <ul class="list-unstyled">
                             {% for ordermeal in order.ordermeal_set.all %}
@@ -73,6 +96,19 @@
                     </td>
                     <td>{{ order.total_price }}元</td>
                     <td>{{ order.building.name }}, {{ order.location }}</td>
+                    <td>
+                        <ul class="list-unstyled">
+                            {% if order.breakfast_deliver_time %}
+                            <li>早餐：{{ order.breakfast_deliver_time }}</li>
+                            {% endif %}
+                            {% if order.lunch_deliver_time %}
+                            <li>午餐：{{ order.lunch_deliver_time }}</li>
+                            {% endif %}
+                            {% if order.supper_deliver_time %}
+                            <li>晚餐：{{ order.supper_deliver_time }}</li>
+                            {% endif %}
+                        </ul>
+                    </td>
                     <td>
                         {{ order.get_status_display }}
                         {{ order.get_operation_buttons|default_if_none:''|safe }}
