@@ -89,6 +89,7 @@ class Meal(models.Model):
     limitations = models.CharField(max_length=64, blank=True)
     categories = models.ManyToManyField(MealCategory)
 
+    is_active = models.BooleanField(default=True)
     creator = models.ForeignKey(User)
     created_at = models.DateTimeField(auto_now_add=True)
 

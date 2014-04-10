@@ -168,7 +168,7 @@ class MealIndexView(TemplateView):
         # get meals by category
         category_id = int(self.request.GET.get('cat', '1'))
         category = MealCategory.objects.get(pk=category_id)
-        data.update({'meals': Meal.objects.filter(categories=category),
+        data.update({'meals': Meal.objects.filter(is_active=True, categories=category),  # noqa
                      'category_id': category_id,
                      'meal_types': Meal.MEAL_TYPES,
                      'meal_categories': MealCategory.objects.all()})

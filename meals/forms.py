@@ -12,14 +12,13 @@ class MealForm(forms.ModelForm):
     """
     class Meta:
         model = Meal
-        fields = ('name', 'price', 'limitations', 'categories')
+        fields = ('name', 'price', 'limitations', 'categories', 'is_active')
         widgets = {
             'name': forms.TextInput(
                 attrs={'class': 'form-control', 'placeholder': '套餐名'}),
             'price': forms.TextInput(
                 attrs={'type': 'number', 'class': 'form-control'}),
             'limitations': forms.CheckboxSelectMultiple(
-                attrs={'class': 'form-control'},
                 choices=Meal.MEAL_TYPE_CHOICES)
         }
 
