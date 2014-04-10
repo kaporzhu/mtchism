@@ -54,7 +54,7 @@
                     <td>
                         <ul class="list-unstyled">
                             {% for ordermeal in order.ordermeal_set.all %}
-                            <li>{{ ordermeal.meal.name }} x {{ ordermeal.amount }}</li>
+                            <li>{{ ordermeal.meal.name }} x {{ ordermeal.amount }}<small>({{ ordermeal.get_meal_type_display }})</small></li>
                             {% endfor %}
                         </ul>
                     </td>
@@ -90,7 +90,7 @@
                     <td>
                         <ul class="list-unstyled">
                             {% for ordermeal in order.ordermeal_set.all %}
-                            <li>{{ ordermeal.meal.name }} x {{ ordermeal.amount }}</li>
+                            <li>{{ ordermeal.meal.name }} x {{ ordermeal.amount }}<small>({{ ordermeal.get_meal_type_display }})</small></li>
                             {% endfor %}
                         </ul>
                     </td>

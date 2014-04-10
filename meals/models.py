@@ -56,6 +56,13 @@ class DishFood(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
+class MealCategory(models.Model):
+    """
+    Meal category
+    """
+    name = models.CharField(max_length=64)
+
+
 class Meal(models.Model):
     """
     Each meal in a day.
@@ -77,6 +84,7 @@ class Meal(models.Model):
     price = models.FloatField(default=0)
     # breakfast, lunch, supper. Seperate with comma
     limitations = models.CharField(max_length=64, blank=True)
+    categories = models.ManyToManyField(MealCategory)
 
     creator = models.ForeignKey(User)
     created_at = models.DateTimeField(auto_now_add=True)
