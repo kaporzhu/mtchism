@@ -7,6 +7,7 @@ from .factories import DishFactory, DishFoodFactory, MealFactory
 from foods.tests.factories import FoodFactory
 from meals.constant import LUNCH, BREAKFAST, SUPPER
 from meals.models import Meal
+from meals.tests.factories import MealCategoryFactory
 
 
 class DishTests(TestCase):
@@ -26,6 +27,18 @@ class DishTests(TestCase):
         self.assertTrue(elements['heat'] == 10)
         for name in ['carbohydrate', 'fat', 'protein', 'cellulose']:
             self.assertTrue(elements[name] == '-')
+
+
+class MealCategoryTests(TestCase):
+    """
+    Tests for MealCategory
+    """
+    def test_unicode(self):
+        """
+        Check if the category name is returned
+        """
+        cat = MealCategoryFactory(name='cat')
+        self.assertEqual('cat', str(cat))
 
 
 class MealTests(TestCase):

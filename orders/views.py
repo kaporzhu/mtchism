@@ -113,19 +113,24 @@ class MyOrderView(LoginRequiredMixin, TemplateView):
         """
         data = super(MyOrderView, self).get_context_data(**kwargs)
         orders = Order.objects.filter(creator=self.request.user)[:15]
-        my_orders = {'tomorrow': [], 'today': [], 'yesterday': []}
+        orders_tomorrow = []
+        orders_today = []
+        order_yesterday = []
         today = datetime.now().date()
         for order in orders:
             interval = (today-order.deliver_date).days
             if interval == -1:
-                my_orders['tomorrow'].append(order)
+                orders_tomorrow.append(order)
             elif interval == 0:
-                my_orders['today'].append(order)
+                orders_today.append(order)
             elif interval == 1:
-                my_orders['yesterday'].append(order)
+                order_yesterday.append(order)
             else:
                 break
 
+        my_orders = [{'label': u'明天', 'orders': orders_tomorrow},
+                     {'label': u'今天', 'orders': orders_today},
+                     {'label': u'昨天', 'orders': order_yesterday}]
         data.update({'my_orders': my_orders})
         return data
 

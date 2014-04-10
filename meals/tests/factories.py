@@ -3,7 +3,7 @@ import factory
 
 from accounts.tests.factories import UserFactory
 from foods.tests.factories import FoodFactory
-from meals.models import Dish, DishFood, Meal
+from meals.models import Dish, DishFood, Meal, MealCategory
 
 
 class DishFactory(factory.DjangoModelFactory):
@@ -26,6 +26,13 @@ class DishFoodFactory(factory.DjangoModelFactory):
     food = factory.SubFactory(FoodFactory)
     creator = factory.SubFactory(UserFactory)
     weight = 100
+
+
+class MealCategoryFactory(factory.DjangoModelFactory):
+    """
+    Factory for MealCategory
+    """
+    FACTORY_FOR = MealCategory
 
 
 class MealFactory(factory.DjangoModelFactory):

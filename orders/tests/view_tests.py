@@ -117,11 +117,10 @@ class MyOrderViewTests(TestCase):
         view = MyOrderView()
         view.request = request
         data = view.get_context_data()
-        self.assertEqual(sorted(['tomorrow', 'today', 'yesterday']),
-                         sorted(data['my_orders']))
-        self.assertIn(order_today, data['my_orders']['today'])
-        self.assertIn(order_tomorrow, data['my_orders']['tomorrow'])
-        self.assertIn(order_yesterday, data['my_orders']['yesterday'])
+        self.assertTrue(len(data['my_orders']) == 3)
+        self.assertIn(order_tomorrow, data['my_orders'][0]['orders'])
+        self.assertIn(order_today, data['my_orders'][1]['orders'])
+        self.assertIn(order_yesterday, data['my_orders'][2]['orders'])
 
 
 class CancelOrderViewTests(TestCase):

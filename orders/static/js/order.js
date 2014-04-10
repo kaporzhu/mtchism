@@ -39,7 +39,7 @@ $(document).ready(function(){
     });
 
     // remove meal type checkbox not checked wanring
-    $('.meal-type').change(function(){
+    $('.meal-type-checkbox').change(function(){
         $(this).parents('td').removeClass('alert-danger');
         update_deliver_time_selector();
     });

@@ -1,0 +1,23 @@
+[
+{
+    "pk": 1, 
+    "model": "meals.mealcategory", 
+    "fields": {
+        "name": "\u542f\u52a8\u671f"
+    }
+},
+{
+    "pk": 2, 
+    "model": "meals.mealcategory", 
+    "fields": {
+        "name": "\u8fc7\u6e21\u671f"
+    }
+},
+{
+    "pk": 3, 
+    "model": "meals.mealcategory", 
+    "fields": {
+        "name": "\u7ef4\u6301\u671f"
+    }
+}
+]
