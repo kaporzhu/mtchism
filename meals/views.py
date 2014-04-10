@@ -2,6 +2,7 @@
 import json
 
 from django.core.urlresolvers import reverse_lazy
+from django.db.models import Q
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView, UpdateView, FormView
 from django.views.generic.list import ListView
@@ -61,6 +62,35 @@ class MealListView(StaffuserRequiredMixin, ListView):
     List view for meals
     """
     model = Meal
+
+    def get_context_data(self, **kwargs):
+        """
+        Add extra data to context
+        """
+        data = super(MealListView, self).get_context_data(**kwargs)
+        data.update({'categories': MealCategory.objects.all(),
+                     'meal_type_choices': Meal.MEAL_TYPE_CHOICES})
+        data.update(self.request.GET.dict())
+        return data
+
+    def get_queryset(self):
+        """
+        Add more filters to the queryset
+        """
+        qs = super(MealListView, self).get_queryset()
+
+        # category
+        cat_id = self.request.GET.get('category', 'all')
+        if cat_id == 'all':
+            category_Q = Q()
+        else:
+            category_Q = Q(categories=MealCategory.objects.get(pk=cat_id))
+
+        # meal type
+        meal_type = self.request.GET.get('meal_type', 'all')
+        meal_type_Q = Q(limitations__icontains=meal_type) if meal_type != 'all' else Q()  # noqa
+
+        return qs.filter(category_Q, meal_type_Q)
 
 
 class CreateDishView(StaffuserRequiredMixin, SetHeadlineMixin, CreateView):

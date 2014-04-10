@@ -14,6 +14,7 @@ from meals.views import(
     CreateMealView, CreateDishView, UpdateDishFoodsView, MealIndexView,
     UpdateMealView
 )
+from meals.views import MealListView
 
 
 class CreateMealViewTests(TestCase):
@@ -246,3 +247,72 @@ class UpdateMealViewTests(TestCase):
         view = UpdateMealView()
         kwargs = view.get_form_kwargs()
         self.assertEqual(kwargs['instance'].limitations, ['lunch'])
+
+
+class MealListViewTests(TestCase):
+    """
+    Tests for MealListView
+    """
+    def _fake_get_context_data(self, **kwargs):
+        """
+        Fake get_context_data, return empty dict directly
+        """
+        return {}
+
+    @mock.patch('django.views.generic.list.ListView.get_context_data',
+                _fake_get_context_data)
+    def test_get_context_data(self, **kwargs):
+        """
+        Check if categories, meal type choices and request GET params are
+        added to the context
+        """
+        request = RequestFactory()
+        request.GET = QueryDict('test=test')
+        view = MealListView()
+        view.request = request
+        data = view.get_context_data()
+        self.assertEqual(sorted(['categories', 'meal_type_choices', 'test']),
+                         sorted(data.keys()))
+
+    def test_get_queryset(self):
+        """
+        Check if the filters are active
+        """
+        meal = MealFactory(limitations='lunch')
+        category = MealCategoryFactory()
+        meal.categories.add(category)
+
+        request = RequestFactory()
+        view = MealListView()
+        view.request = request
+
+        # with all
+        request.GET = {'category': 'all', 'meal_type': 'all'}
+        qs = view.get_queryset()
+        self.assertIn(meal, qs)
+
+        # invalid meal type
+        request.GET = {'category': 'all', 'meal_type': 'test'}
+        qs = view.get_queryset()
+        self.assertNotIn(meal, qs)
+
+        # valid meal type
+        request.GET = {'category': 'all', 'meal_type': 'lunch'}
+        qs = view.get_queryset()
+        self.assertIn(meal, qs)
+
+        # alone category
+        category2 = MealCategoryFactory()
+        request.GET = {'category': category2.id, 'meal_type': 'test'}
+        qs = view.get_queryset()
+        self.assertNotIn(meal, qs)
+
+        # valid category
+        request.GET = {'category': category.id, 'meal_type': 'all'}
+        qs = view.get_queryset()
+        self.assertIn(meal, qs)
+
+        # valid category and meal type
+        request.GET = {'category': category.id, 'meal_type': 'lunch'}
+        qs = view.get_queryset()
+        self.assertIn(meal, qs)

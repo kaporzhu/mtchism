@@ -114,3 +114,9 @@ class Meal(models.Model):
                 if limit in self.MEAL_TYPES:
                     limitations.append(self.MEAL_TYPES[limit])
         return ','.join(limitations)
+
+    def get_categories_display(self):
+        """
+        Get categories label
+        """
+        return ','.join([cat.name for cat in self.categories.all()])
