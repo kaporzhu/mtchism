@@ -16,6 +16,14 @@
 
 <div class="row">
     <div class="col-md-8" id="meals">
+        <div class="btn-group btn-group-justified">
+            {% for cat in meal_categories%}
+            <div class="btn-group">
+                <a href="?cat={{ cat.id }}" type="button" class="btn btn-default {% if category_id == cat.id %}active{% endif %}">{{ cat.name }}</a>
+            </div>
+            {% endfor %}
+        </div>
+        <br />
         <div class="list-group">
             {% for meal in meals %}
             <span class="list-group-item">

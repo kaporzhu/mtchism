@@ -11,7 +11,7 @@ from braces.views import(
 )
 
 from .forms import MealForm, DishForm, UpdateDishFoodsForm
-from .models import Meal, Dish, DishFood
+from .models import Meal, Dish, DishFood, MealCategory
 from foods.models import Food
 
 
@@ -165,6 +165,11 @@ class MealIndexView(TemplateView):
         Add extra data to context
         """
         data = super(MealIndexView, self).get_context_data(**kwargs)
-        data.update({'meals': Meal.objects.all(),
-                     'meal_types': Meal.MEAL_TYPES})
+        # get meals by category
+        category_id = int(self.request.GET.get('cat', '1'))
+        category = MealCategory.objects.get(pk=category_id)
+        data.update({'meals': Meal.objects.filter(categories=category),
+                     'category_id': category_id,
+                     'meal_types': Meal.MEAL_TYPES,
+                     'meal_categories': MealCategory.objects.all()})
         return data

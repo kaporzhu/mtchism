@@ -5,7 +5,7 @@ from django.test.testcases import TestCase
 
 import mock
 
-from .factories import MealFactory, DishFactory
+from .factories import MealFactory, DishFactory, MealCategoryFactory
 from accounts.tests.factories import UserFactory
 from foods.tests.factories import FoodFactory
 from meals.forms import MealForm, DishForm, UpdateDishFoodsForm
@@ -33,6 +33,7 @@ class CreateMealViewTests(TestCase):
         Check if the meal object is created
         """
         # create view
+        cat = MealCategoryFactory()
         user = UserFactory()
         request = RequestFactory()
         request.user = user
@@ -40,7 +41,7 @@ class CreateMealViewTests(TestCase):
         view.request = request
 
         # create form
-        form = MealForm(QueryDict('name=Meal name&price=10&limitations=lunch'))
+        form = MealForm(QueryDict('name=Meal name&price=10&limitations=lunch&categories={}'.format(cat.id)))  # noqa
 
         # test now
         view.form_valid(form)
@@ -199,9 +200,15 @@ class MealIndexViewTests(TestCase):
         """
         Check if the meals is added to the context
         """
+        cat = MealCategoryFactory()
+        request = RequestFactory()
+        request.GET = {'cat': cat.id}
         view = MealIndexView()
+        view.request = request
         data = view.get_context_data()
-        self.assertTrue('meals' in data)
+        self.assertEqual(
+            sorted(data.keys()),
+            sorted(['meals', 'category_id', 'meal_types', 'meal_categories']))
 
 
 class UpdateMealViewTests(TestCase):
