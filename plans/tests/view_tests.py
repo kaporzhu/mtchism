@@ -10,7 +10,7 @@ from plans.models import Plan
 from plans.views import CreatePlanView
 
 
-class CreatPlanViewTests(TestCase):
+class CreatePlanViewTests(TestCase):
     """
     Tests for CreatePlanView
     """

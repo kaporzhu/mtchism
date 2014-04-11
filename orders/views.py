@@ -112,7 +112,8 @@ class MyOrderView(LoginRequiredMixin, TemplateView):
         Add my orders to the context
         """
         data = super(MyOrderView, self).get_context_data(**kwargs)
-        orders = Order.objects.filter(creator=self.request.user)[:15]
+        orders = Order.objects.filter(
+            creator=self.request.user).order_by('-deliver_date')[:30]
         orders_tomorrow = []
         orders_today = []
         order_yesterday = []
