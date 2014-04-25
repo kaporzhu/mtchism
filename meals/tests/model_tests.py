@@ -60,3 +60,14 @@ class MealTests(TestCase):
         """
         meal = MealFactory(limitations='["{}","{}","{}"]'.format(BREAKFAST, LUNCH, SUPPER))  # noqa
         self.assertEqual(meal.get_limitations_display(), u'早餐,午餐,晚餐')
+
+    def test_get_categories_display(self):
+        """
+        Check if the categories label is returned
+        """
+        cat1 = MealCategoryFactory(name='cat1')
+        cat2 = MealCategoryFactory(name='cat2')
+        meal = MealFactory(limitations='["{}"]'.format(LUNCH))
+        meal.categories.add(cat1)
+        meal.categories.add(cat2)
+        self.assertEqual(meal.get_categories_display(), 'cat1,cat2')
