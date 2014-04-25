@@ -13,6 +13,7 @@ class MtCHIsmTemplateTagTests(TestCase):
         """
         class Form(forms.Form):
             name = forms.CharField()
+            is_active = forms.BooleanField()
 
         tpl = template.Template(
             '{% load mtchism_template_tags %}'
@@ -21,15 +22,15 @@ class MtCHIsmTemplateTagTests(TestCase):
         self.assertTrue('class="hidden"' in rendered)
         self.assertTrue('placeholder="test"' in rendered)
 
+        tpl = template.Template(
+            '{% load mtchism_template_tags %}'
+            '{{ form.is_active|add_attrs:"class:hidden" }}')
+        rendered = tpl.render(template.Context({'form': Form()}))
+        self.assertTrue('class="hidden"' not in rendered)
+
     def test_is_checkbox(self):
         """
         Check if the field is a checkbox
         """
         class Form(forms.Form):
             active = forms.BooleanField()
-
-        tpl = template.Template(
-            '{% load mtchism_template_tags %}'
-            '{{ form.active|is_checkbox }}')
-        rendered = tpl.render(template.Context({'form': Form()}))
-        self.assertTrue(rendered == 'True')

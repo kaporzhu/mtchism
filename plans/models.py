@@ -38,10 +38,10 @@ class Stage(models.Model):
     """
     Plan stage model.
     """
-    name = models.CharField(max_length=64)
-    days = models.SmallIntegerField()
+    name = models.CharField(u'名字', max_length=64)
+    days = models.SmallIntegerField(u'天数')
     plan = models.ForeignKey(Plan)
-    index = models.SmallIntegerField(default=0)
+    index = models.SmallIntegerField(u'顺序', default=0)
 
     creator = models.ForeignKey(User)
     created_at = models.DateTimeField(auto_now_add=True)

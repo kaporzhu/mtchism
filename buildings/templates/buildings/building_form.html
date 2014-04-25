@@ -16,11 +16,7 @@
         <div class="form-group">
             <label class="col-md-2 control-label">{{ field.label }}: </label>
             <div class="col-sm-6">
-                {% if field|is_checkbox %}
-                    {{ field }}
-                {% else %}
-                    {{ field|add_attrs:"class:form-control" }}
-                {% endif %}
+                {{ field|add_attrs:"class:form-control" }}
                 {% if field.name == 'tags' %}
                 <input type="text" class="text" placeholder="添加类别" id="new-tag-input" /><input type="button" class="btn btn-default" id="add-tag-btn" value="添加" />
                 {% endif %}
