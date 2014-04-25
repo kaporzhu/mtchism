@@ -7,12 +7,15 @@ register = template.Library()
 
 
 @register.filter
-def add_attr(field, attr):
+def add_attrs(field, attrs_str):
     """
     Add attribute to the html tag
     """
-    name, value = attr.split(',')
-    return field.as_widget(attrs={name: value})
+    attrs = {}
+    for attr in attrs_str.split(';'):
+        attr_name, attr_value = attr.split(':')
+        attrs[attr_name] = attr_value
+    return field.as_widget(attrs=attrs)
 
 
 @register.filter

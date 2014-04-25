@@ -16,9 +16,10 @@ class MtCHIsmTemplateTagTests(TestCase):
 
         tpl = template.Template(
             '{% load mtchism_template_tags %}'
-            '{{ form.name|add_attr:"class,hidden" }}')
+            '{{ form.name|add_attrs:"class:hidden;placeholder:test" }}')
         rendered = tpl.render(template.Context({'form': Form()}))
         self.assertTrue('class="hidden"' in rendered)
+        self.assertTrue('placeholder="test"' in rendered)
 
     def test_is_checkbox(self):
         """

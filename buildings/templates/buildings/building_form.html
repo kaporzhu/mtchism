@@ -19,7 +19,7 @@
                 {% if field|is_checkbox %}
                     {{ field }}
                 {% else %}
-                    {{ field|add_attr:"class,form-control" }}
+                    {{ field|add_attrs:"class:form-control" }}
                 {% endif %}
                 {% if field.name == 'tags' %}
                 <input type="text" class="text" placeholder="添加类别" id="new-tag-input" /><input type="button" class="btn btn-default" id="add-tag-btn" value="添加" />
