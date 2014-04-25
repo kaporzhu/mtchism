@@ -36,6 +36,7 @@ LOCAL_APPS = (
     'meals',
     'mtchism',
     'orders',
+    'plans',
     'portals',
 )
 
