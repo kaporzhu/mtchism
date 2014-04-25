@@ -17,8 +17,8 @@ class Plan(models.Model):
         Stage
             Meal
     """
-    name = models.CharField(max_length=64)
-    is_active = models.BooleanField(default=True)
+    name = models.CharField(u'名字', max_length=64)
+    is_active = models.BooleanField(u'启用', default=True)
 
     creator = models.ForeignKey(User)
     created_at = models.DateTimeField(auto_now_add=True)
