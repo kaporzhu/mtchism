@@ -115,7 +115,12 @@ class UserPlan(models.Model):
                                        ended_at=ended_at)
                 user_stage.save()
                 started_at = ended_at
-            self.current_stage = self.userstage_set.all().order_by('index').first()
+
+            # set current stage
+            self.current_stage = self.userstage_set.filter(
+                status=READY).order_by('index').first()
+            self.current_stage.status = RUNNING
+            self.current_stage.save()
             self.save()
 
     def give_up(self):
@@ -135,9 +140,25 @@ class UserPlan(models.Model):
         If reach the end date, update the status.
         """
         if self.status == RUNNING:
-            if datetime.now().date() > self.ended_at.date():
+            now = datetime.now().date()
+            # update user plan status
+            if now > self.ended_at.date():
                 self.status = DONE
                 self.save()
+
+            # update user stage status
+            for user_stage in self.userstage_set.all():
+                if user_stage.status == RUNNING and now > user_stage.ended_at.date():  # noqa
+                    user_stage.status = DONE
+                    user_stage.save()
+
+                    # switch user plan to next stage
+                    index = user_stage.index
+                    next_stage = self.userstage_set.filter(
+                        status=READY, index__gt=index).order_by('index').first()  # noqa
+                    next_stage.status = RUNNING
+                    next_stage.save()
+                    self.current_stage = next_stage
 
 
 class UserStage(models.Model):
