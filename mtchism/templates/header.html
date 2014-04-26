@@ -24,14 +24,16 @@
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
           <ul class="nav navbar-nav">
-              <li>
-                  <a class="navbar-brand" href="{% url 'meals:index' %}">订餐</a>
+              {% url 'meals:index' as url %}
+              <li {% if request.path == url %}class="selected"{% endif %}>
+                  <a class="navbar-brand" href="{{ url }}">订餐</a>
               </li>
           </ul>
           {% if user.is_authenticated %}
           <ul class="nav navbar-nav">
-              <li>
-                  <a class="navbar-brand" href="{% url 'orders:mine' %}">我的订单</a>
+              {% url 'orders:mine' as url %}
+              <li {% if request.path == url %}class="selected"{% endif %}>
+                  <a class="navbar-brand" href="{{ url }}">我的订单</a>
               </li>
           </ul>
           {% endif %}
