@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}所有计划{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-12">
+        <ul class="list-group">
+            {% for plan in plans %}
+            <li class="list-group-item">
+                {{ plan.name }}
+                {% if plan.id in user.joined_plan_ids %}
+                <a href="#" class="btn btn-primary btn-xs pull-right">已加入</a>
+                {% else %}
+                <a href="{% url 'plans:join' pk=plan.id %}" class="btn btn-primary btn-xs pull-right">加入</a>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

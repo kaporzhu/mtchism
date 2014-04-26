@@ -6,9 +6,11 @@ import mock
 
 from accounts.tests.factories import UserFactory
 from plans.forms import PlanForm, StageForm
-from plans.models import Plan, Stage
-from plans.tests.factories import PlanFactory
-from plans.views import CreatePlanView, CreateStageView
+from plans.models import Plan, Stage, UserPlan
+from plans.tests.factories import PlanFactory, UserPlanFactory
+from plans.views import(
+    CreatePlanView, CreateStageView, IndexView, JoinPlanView
+)
 
 
 class CreatePlanViewTests(TestCase):
@@ -65,3 +67,57 @@ class CreateStageViewTests(TestCase):
         view.kwargs = {'plan_pk': plan.id}
         view.form_valid(form)
         self.assertTrue(Stage.objects.filter(name=name).exists())
+
+
+class IndexViewTests(TestCase):
+    """
+    Tests for IndexView
+    """
+    def _fake_get_context_data(self):
+        """
+        Fake get_context_data, return empty dict directly
+        """
+        return {}
+
+    @mock.patch('django.views.generic.base.TemplateView.get_context_data',
+                _fake_get_context_data)
+    def test_get_context_data(self):
+        """
+        Check if plans are added to the context.
+        Check if the joined_plan_ids are added for authenticated user
+        """
+        plan = PlanFactory()
+        user = UserFactory()
+        user_plan = UserPlanFactory(user=user, plan=plan)
+        request = RequestFactory()
+        request.user = user
+        view = IndexView()
+        view.request = request
+        data = view.get_context_data()
+        self.assertIn('plans', data)
+        self.assertIn(user_plan.id, user.joined_plan_ids)
+
+
+class JoinPlanViewTests(TestCase):
+    """
+    Tests for JoinPlanView
+    """
+    def _fake_get_redirect_url(self, *args, **kwargs):
+        """
+        Fake get_redirect_url, return empty dict directly
+        """
+        return None
+
+    @mock.patch('django.views.generic.base.RedirectView.get_redirect_url',
+                _fake_get_redirect_url)
+    def test_get_redirect_url(self):
+        """
+        Check user plan is created
+        """
+        plan = PlanFactory()
+        request = RequestFactory()
+        request.user = UserFactory()
+        view = JoinPlanView()
+        view.request = request
+        view.get_redirect_url(pk=plan.id)
+        self.assertTrue(UserPlan.objects.filter(plan=plan).exists())
