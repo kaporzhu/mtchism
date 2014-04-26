@@ -85,9 +85,13 @@ class IndexView(TemplateView):
         data = super(IndexView, self).get_context_data(**kwargs)
         user = self.request.user
         if user.is_authenticated():
-            user.joined_plan_ids = user.userplan_set.values_list('plan__id',
-                                                              flat=True)
-        data.update({'plans': Plan.objects.filter(is_active=True)})
+            user_plans = user.userplan_set.all()
+            joined_plan_ids = user_plans.values_list('plan__id', flat=True)
+            other_plans = Plan.objects.filter(
+                is_active=True).exclude(id__in=joined_plan_ids)
+            data.update({'user_plans': user_plans, 'other_plans': other_plans})
+        else:
+            data.update({'plans': Plan.objects.filter(is_active=True)})
         return data
 
 

@@ -83,10 +83,10 @@ class IndexViewTests(TestCase):
                 _fake_get_context_data)
     def test_get_context_data(self):
         """
-        Check if plans are added to the context.
-        Check if the joined_plan_ids are added for authenticated user
+        Check if user plans and other plans are added to the context.
         """
         plan = PlanFactory()
+        other_plan = PlanFactory()
         user = UserFactory()
         user_plan = UserPlanFactory(user=user, plan=plan)
         request = RequestFactory()
@@ -94,8 +94,8 @@ class IndexViewTests(TestCase):
         view = IndexView()
         view.request = request
         data = view.get_context_data()
-        self.assertIn('plans', data)
-        self.assertIn(user_plan.id, user.joined_plan_ids)
+        self.assertIn(user_plan, data['user_plans'])
+        self.assertIn(other_plan, data['other_plans'])
 
 
 class JoinPlanViewTests(TestCase):

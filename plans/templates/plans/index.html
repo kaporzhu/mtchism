@@ -6,18 +6,29 @@
 
 <div class="row">
     <div class="col-md-12">
+        {% if user_plans %}
         <ul class="list-group">
-            {% for plan in plans %}
+            {% for user_plan in user_plans %}
             <li class="list-group-item">
-                {{ plan.name }}
-                {% if plan.id in user.joined_plan_ids %}
-                <a href="#" class="btn btn-primary btn-xs pull-right">已加入</a>
-                {% else %}
-                <a href="{% url 'plans:join' pk=plan.id %}" class="btn btn-primary btn-xs pull-right">加入</a>
-                {% endif %}
+                {{ user_plan.plan.name }}
+                <a href="#" class="btn btn-primary btn-xs pull-right">进入</a>
             </li>
             {% endfor %}
         </ul>
+        {% endif %}
+        <br />
+
+        {% if other_plans %}
+        <p><small>更多...</small></p>
+        <ul class="list-group">
+            {% for plan in other_plans %}
+            <li class="list-group-item">
+                {{ plan.name }}
+                <a href="{% url 'plans:join' pk=plan.id %}" class="btn btn-default btn-xs pull-right">加入</a>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

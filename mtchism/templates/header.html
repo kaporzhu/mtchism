@@ -29,6 +29,12 @@
                   <a class="navbar-brand" href="{{ url }}">订餐</a>
               </li>
           </ul>
+          <ul class="nav navbar-nav">
+              {% url 'plans:index' as url %}
+              <li {% if request.path == url %}class="selected"{% endif %}>
+                  <a class="navbar-brand" href="{{ url }}">减肥计划</a>
+              </li>
+          </ul>
           {% if user.is_authenticated %}
           <ul class="nav navbar-nav">
               {% url 'orders:mine' as url %}
