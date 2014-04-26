@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django import forms
 
-from .models import Plan, Stage
+from .models import Plan, Stage, StageMeal
 
 
 class PlanForm(forms.ModelForm):
@@ -20,3 +20,12 @@ class StageForm(forms.ModelForm):
     class Meta:
         model = Stage
         fields = ('name', 'days', 'index',)
+
+
+class StageMealForm(forms.ModelForm):
+    """
+    Stage meal model form
+    """
+    class Meta:
+        model = StageMeal
+        fields = ('category', 'meal',)

@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-from django.core.urlresolvers import reverse_lazy
+from django.core.urlresolvers import reverse_lazy, reverse
 from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
 
 from braces.views import StaffuserRequiredMixin, LoginRequiredMixin
 
-from .forms import PlanForm, StageForm
-from .models import Plan, Stage, UserPlan
+from .forms import PlanForm, StageForm, StageMealForm
+from .models import Plan, Stage, UserPlan, StageMeal
 
 
 class CreatePlanView(StaffuserRequiredMixin, CreateView):
@@ -91,7 +91,7 @@ class IndexView(TemplateView):
                 is_active=True).exclude(id__in=joined_plan_ids)
             data.update({'user_plans': user_plans, 'other_plans': other_plans})
         else:
-            data.update({'plans': Plan.objects.filter(is_active=True)})
+            data.update({'other_plans': Plan.objects.filter(is_active=True)})
         return data
 
 
@@ -109,3 +109,57 @@ class JoinPlanView(LoginRequiredMixin, RedirectView):
         plan = Plan.objects.get(pk=kwargs['pk'])
         UserPlan(plan=plan, user=self.request.user, days=plan.days).save()
         return super(JoinPlanView, self).get_redirect_url(*args, **kwargs)
+
+
+class CreateMealView(StaffuserRequiredMixin, CreateView):
+    """
+    Add meal to the plan stage
+    """
+    model = StageMeal
+    form_class = StageMealForm
+
+    def get_success_url(self):
+        return reverse('plans:meal_list', kwargs=self.kwargs)
+
+    def form_valid(self, form):
+        """
+        Set extra fields for new stage meal
+        """
+        stage_meal = form.save(commit=False)
+        stage_meal.stage = Stage.objects.get(pk=self.kwargs['stage_pk'])
+        stage_meal.creator = self.request.user
+        stage_meal.save()
+        return super(CreateMealView, self).form_valid(form)
+
+
+class UpdateMealView(StaffuserRequiredMixin, UpdateView):
+    """
+    Update stage meal
+    """
+    model = StageMeal
+    form_class = StageMealForm
+
+    def get_success_url(self):
+        return reverse('plans:meal_list', kwargs=self.kwargs)
+
+
+class MealListView(StaffuserRequiredMixin, ListView):
+    """
+    Display stage meals
+    """
+    model = StageMeal
+
+    def get_context_data(self, **kwargs):
+        """
+        Add extra data to context
+        """
+        data = super(MealListView, self).get_context_data(**kwargs)
+        data.update(self.kwargs)
+        return data
+
+    def get_queryset(self):
+        """
+        Get all stage meals for currrent stage
+        """
+        stage = Stage.objects.get(pk=self.kwargs['stage_pk'])
+        return stage.stagemeal_set.all().order_by('category')

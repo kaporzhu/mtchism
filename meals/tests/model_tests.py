@@ -71,3 +71,10 @@ class MealTests(TestCase):
         meal.categories.add(cat1)
         meal.categories.add(cat2)
         self.assertEqual(meal.get_categories_display(), 'cat1,cat2')
+
+    def test_unicode(self):
+        """
+        Check if the name and price are returned
+        """
+        meal = MealFactory(name='test', price='10')
+        self.assertEqual(u'test[10元]', unicode(meal))

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}所有计划{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-12">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>套餐</th>
+                    <th>类别</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for stage_meal in object_list %}
+                <tr>
+                    <td>
+                        {{ stage_meal.meal.name }}
+                        <a href="{% url 'plans:update_meal' plan_pk=plan_pk stage_pk=stage_pk pk=stage_meal.id %}">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                        </a>
+                    </td>
+                    <td>{{ stage_meal.get_category_display }}</td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td colspan="2">
+                        <a href="{% url 'plans:create_meal' plan_pk=plan_pk stage_pk=stage_pk %}">
+                            <span class="glyphicon glyphicon-plus"></span>
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

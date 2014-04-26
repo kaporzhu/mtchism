@@ -120,3 +120,6 @@ class Meal(models.Model):
         Get categories label
         """
         return ','.join([cat.name for cat in self.categories.all()])
+
+    def __unicode__(self):
+        return u'{}[{}元]'.format(self.name, self.price)

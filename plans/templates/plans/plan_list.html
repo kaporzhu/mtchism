@@ -32,6 +32,7 @@
                                 <th>名字</th>
                                 <th>天数</th>
                                 <th>顺序</th>
+                                <th>套餐</th>
                             </tr>
                             {% for stage in plan.stage_set.all %}
                             <tr>
@@ -42,6 +43,11 @@
                                 </td>
                                 <td>{{ stage.days }}</td>
                                 <td>{{ stage.index }}</td>
+                                <td>
+                                    <a href="{% url 'plans:meal_list' plan_pk=plan.id stage_pk=stage.id %}">
+                                        <span class="glyphicon glyphicon-th-list"></span>
+                                    </a>
+                                </td>
                             </tr>
                             {% endfor %}
                             <tr>

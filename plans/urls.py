@@ -3,7 +3,8 @@ from django.conf.urls import patterns, url
 
 from .views import(
     CreatePlanView, UpdatePlanView, PlanListView, CreateStageView,
-    UpdateStageView, IndexView, JoinPlanView
+    UpdateStageView, IndexView, JoinPlanView, CreateMealView, UpdateMealView,
+    MealListView
 )
 
 
@@ -18,4 +19,10 @@ urlpatterns = patterns(
         CreateStageView.as_view(), name='create_stage'),
     url(r'^(?P<plan_pk>\d+)/stages/(?P<pk>\d+)/update/$',
         UpdateStageView.as_view(), name='update_stage'),
+    url(r'^(?P<plan_pk>\d+)/stages/(?P<stage_pk>\d+)/meals/create/$',
+        CreateMealView.as_view(), name='create_meal'),
+    url(r'^(?P<plan_pk>\d+)/stages/(?P<stage_pk>\d+)/meals/list/$',
+        MealListView.as_view(), name='meal_list'),
+    url(r'^(?P<plan_pk>\d+)/stages/(?P<stage_pk>\d+)/meals/(?P<pk>\d+)/update/$',  # noqa
+        UpdateMealView.as_view(), name='update_meal'),
 )
