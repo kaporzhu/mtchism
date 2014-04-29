@@ -3,8 +3,14 @@ from datetime import datetime, timedelta
 
 from django.test.testcases import TestCase
 
-from .factories import PlanFactory, StageFactory, UserPlanFactory
-from plans.constants import JOINED, RUNNING, GIVENUP, DONE
+from .factories import(
+    PlanFactory, StageFactory, UserPlanFactory, UserStageDayFactory,
+    StageMealFactory
+)
+from plans.constants import(
+    JOINED, RUNNING, GIVENUP, DONE, FAILED, FINISHED, UPCOMING,
+    WAITING, BREAKFAST, LUNCH, SUPPER
+)
 from plans.models import UserStage
 
 
@@ -97,3 +103,50 @@ class UserPlanTests(TestCase):
         self.assertEqual(user_plan.current_stage.status, RUNNING)
         self.assertTrue(
             UserStage.objects.filter(status=DONE, stage=stage_one).exists())
+
+
+class UserStageTests(TestCase):
+    """
+    Tests for UserStage model
+    """
+    def test_get_stage_days(self):
+        """
+        Check if the stage days are returned
+        """
+        plan = PlanFactory()
+        stage = StageFactory(plan=plan)
+        user_plan = UserPlanFactory(plan=plan, status=JOINED)
+        user_plan.start()
+        user_stage = UserStage.objects.get(stage=stage)
+        days = user_stage.get_stage_days()
+        self.assertEqual(len(days), user_stage.days)
+        self.assertEqual(days[0]['status'], FAILED)
+        self.assertEqual(days[1]['status'], UPCOMING)
+        self.assertEqual(days[2]['status'], WAITING)
+        UserStageDayFactory(user_stage=user_stage,
+                            date=(datetime.now() + timedelta(days=1)).date())
+        days = user_stage.get_stage_days()
+        self.assertEqual(days[0]['status'], FAILED)
+        self.assertEqual(days[1]['status'], FINISHED)
+        self.assertEqual(days[2]['status'], WAITING)
+
+
+class UserStageDayTests(TestCase):
+    """
+    Tests for UserStageDay model
+    """
+    def test_get_meals(self):
+        """
+        Check if the meals are grouped
+        """
+        stage_day = UserStageDayFactory()
+        breakfast = StageMealFactory(category=BREAKFAST)
+        lunch = StageMealFactory(category=LUNCH)
+        supper = StageMealFactory(category=SUPPER)
+        stage_day.meals.add(breakfast)
+        stage_day.meals.add(lunch)
+        stage_day.meals.add(supper)
+        meals = stage_day.get_meals()
+        self.assertIn(breakfast, meals[BREAKFAST]['meals'])
+        self.assertIn(lunch, meals[LUNCH]['meals'])
+        self.assertIn(supper, meals[SUPPER]['meals'])

@@ -5,9 +5,11 @@ from django.contrib.auth.models import User
 from django.db import models
 
 from .constants import(
-    BREAKFAST, LUNCH, SUPPER, OTHER, JOINED, RUNNING, DONE, GIVENUP, READY
+    BREAKFAST, LUNCH, SUPPER, OTHER, JOINED, RUNNING, DONE, GIVENUP, READY,
+    FINISHED, FAILED, UPCOMING, WAITING,
 )
 from meals.models import Meal
+from orders.models import Order
 
 
 class Plan(models.Model):
@@ -110,6 +112,7 @@ class UserPlan(models.Model):
                 user_stage = UserStage(user=self.user,
                                        user_plan=self,
                                        stage=stage,
+                                       days=stage.days,
                                        index=stage.index,
                                        started_at=started_at,
                                        ended_at=ended_at)
@@ -176,6 +179,7 @@ class UserStage(models.Model):
     user = models.ForeignKey(User)
     user_plan = models.ForeignKey(UserPlan)
     stage = models.ForeignKey(Stage)
+    days = models.SmallIntegerField(default=0)
     status = models.CharField(choices=STATUS_CHOICES, default=READY,
                               max_length=32)
     index = models.SmallIntegerField()
@@ -185,6 +189,34 @@ class UserStage(models.Model):
     started_at = models.DateTimeField(blank=True, null=True)
     ended_at = models.DateTimeField(blank=True, null=True)
 
+    def get_stage_days(self):
+        """
+        Get all days for current stage. If it doesn't exist, add fake one.
+        """
+        tomorrow = (datetime.now() + timedelta(days=1)).date()
+        stage_days = self.userstageday_set.all().order_by('date')
+        count = stage_days.count()
+        index = 0
+        days = []
+        date = self.started_at.date()
+        for i in range(self.days):
+            if index < count:
+                day = stage_days[index]
+                if date == day.date:
+                    days.append({'date': date, 'status': FINISHED, 'day': day})
+                    index += 1
+                elif date < day.date:
+                    days.append({'date': date, 'status': FAILED})
+            else:
+                if tomorrow == date:
+                    days.append({'date': date, 'status': UPCOMING})
+                elif tomorrow > date:
+                    days.append({'date': date, 'status': FAILED})
+                else:
+                    days.append({'date': date, 'status': WAITING})
+            date += timedelta(days=1)
+        return days
+
 
 class UserStageDay(models.Model):
     """
@@ -193,4 +225,16 @@ class UserStageDay(models.Model):
     user = models.ForeignKey(User)
     user_stage = models.ForeignKey(UserStage)
     meals = models.ManyToManyField(StageMeal)
+    order = models.ForeignKey(Order, blank=True, null=True)
+    date = models.DateField()
+    weight = models.FloatField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def get_meals(self):
+        """
+        Group meals by category
+        """
+        meals_grouped = {cat: {'label': display, 'meals': []} for cat, display in StageMeal.CATEGORY_CHOICES}  # noqa
+        for meal in self.meals.all():
+            meals_grouped[meal.category]['meals'].append(meal)
+        return meals_grouped

@@ -4,16 +4,19 @@ from django.test.testcases import TestCase
 
 import mock
 
+from .factories import(
+    PlanFactory, UserPlanFactory, StageFactory, StageMealFactory,
+    UserStageDayFactory
+)
 from accounts.tests.factories import UserFactory
 from meals.tests.factories import MealFactory
-from plans.constants import BREAKFAST
+from plans.constants import BREAKFAST, RUNNING, LUNCH, SUPPER, OTHER
 from plans.forms import PlanForm, StageForm, StageMealForm
-from plans.models import Plan, Stage, UserPlan, StageMeal
-from plans.tests.factories import PlanFactory, UserPlanFactory, StageFactory,\
-    StageMealFactory
+from plans.models import Plan, Stage, UserPlan, StageMeal, UserStageDay
 from plans.views import(
     CreatePlanView, CreateStageView, IndexView, JoinPlanView,
-    CreateMealView, UpdateMealView, MealListView
+    CreateMealView, UpdateMealView, MealListView, AddWeightView,
+    UserPlanDetailView, StartUserPlanView, BookingView
 )
 
 
@@ -217,3 +220,90 @@ class MealListViewTests(TestCase):
         qs = view.get_queryset()
         self.assertIn(stage_meal_one, qs)
         self.assertNotIn(stage_meal_two, qs)
+
+
+class AddWeightViewTests(TestCase):
+    """
+    Tests for AddWeightView
+    """
+    def test_get_ajax(self):
+        """
+        Check if the weight field is updated
+        """
+        day = UserStageDayFactory()
+        request = RequestFactory()
+        request.GET = {'weight': 72}
+        view = AddWeightView()
+        view.request = request
+        view.get_ajax(request, pk=day.id)
+        self.assertEqual(UserStageDay.objects.get(pk=day.id).weight, 72)
+
+
+class UserPlanDetailViewTests(TestCase):
+    """
+    Tests for UserPlanDetailView
+    """
+    def _fake_get_context_data(self):
+        """
+        Fake get_context_data, return empty dict directly
+        """
+        return {}
+
+    @mock.patch('django.views.generic.detail.DetailView.get_context_data',
+                _fake_get_context_data)
+    def test_get_context_data(self):
+        """
+        Check if the required fields are added to the context
+        """
+        view = UserPlanDetailView()
+        view.object = UserPlanFactory()
+        data = view.get_context_data()
+        self.assertIn('user_stages', data)
+        self.assertIn('FINISHED', data)
+        self.assertIn('FAILED', data)
+        self.assertIn('UPCOMING', data)
+        self.assertIn('WAITING', data)
+
+
+class StartUserPlanViewTests(TestCase):
+    """
+    Tests for StartUserPlanView
+    """
+    def test_get_redirect_url(self):
+        """
+        Check if the user plan is started
+        """
+        user_plan = UserPlanFactory()
+        StageFactory(plan=user_plan.plan)
+        view = StartUserPlanView()
+        view.get_redirect_url(pk=user_plan.id)
+        self.assertEqual(UserPlan.objects.get(pk=user_plan.id).status, RUNNING)
+
+
+class BookingViewTests(TestCase):
+    """
+    Tests for BookingView
+    """
+    def _fake_get_context_data(self, *args, **kwargs):
+        """
+        Fake get_context_data, return empty dict directly
+        """
+        return {}
+
+    @mock.patch('django.views.generic.base.TemplateView.get_context_data',
+                _fake_get_context_data)
+    def test_get_context_data(self):
+        """
+        Check if the required fields are added to the context
+        """
+        user_plan = UserPlanFactory()
+        stage = StageFactory(plan=user_plan.plan)
+        breakfast = StageMealFactory(category=BREAKFAST, stage=stage)
+        user_plan.start()
+        view = BookingView()
+        view.kwargs = {'pk': user_plan.id}
+        data = view.get_context_data(**view.kwargs)
+        for meal in data['meals']:
+            if meal['type'] == BREAKFAST:
+                self.assertIn(breakfast, meal['meals'])
+                break

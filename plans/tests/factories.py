@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
+
 import factory
 
 from accounts.tests.factories import UserFactory
@@ -74,3 +76,4 @@ class UserStageDayFactory(factory.DjangoModelFactory):
 
     user = factory.SubFactory(UserFactory)
     user_stage = factory.SubFactory(UserStageFactory)
+    date = datetime.now().date()

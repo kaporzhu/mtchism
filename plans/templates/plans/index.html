@@ -9,10 +9,14 @@
         {% if user_plans %}
         <ul class="list-group">
             {% for user_plan in user_plans %}
-            <li class="list-group-item">
-                {{ user_plan.plan.name }}
-                <a href="#" class="btn btn-primary btn-xs pull-right">进入</a>
-            </li>
+                {% if user_plan.status == JOINED %}
+                <li class="list-group-item">
+                    {{ user_plan.plan.name }}
+                    <a href="{% url 'plans:start_userplan' pk=user_plan.id %}" class="btn btn-primary btn-xs pull-right">开始</a>
+                </li>
+                {% else %}
+                <a href="{% url 'plans:userplan_detail' pk=user_plan.id %}" class="list-group-item"><span class="glyphicon glyphicon-ok"></span> {{ user_plan.plan.name }}</a>
+                {% endif %}
             {% endfor %}
         </ul>
         {% endif %}
@@ -24,7 +28,7 @@
             {% for plan in other_plans %}
             <li class="list-group-item">
                 {{ plan.name }}
-                <a href="{% url 'plans:join' pk=plan.id %}" class="btn btn-default btn-xs pull-right">加入</a>
+                <a href="{% url 'plans:join' pk=plan.id %}" class="btn btn-primary btn-xs pull-right">加入</a>
             </li>
             {% endfor %}
         </ul>

@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
+
 import factory
 
 from accounts.tests.factories import UserFactory
@@ -13,6 +15,7 @@ class OrderFactory(factory.DjangoModelFactory):
     FACTORY_FOR = Order
 
     creator = factory.SubFactory(UserFactory)
+    deliver_date = datetime.now().date()
 
 
 class OrderMealFactory(factory.DjangoModelFactory):
