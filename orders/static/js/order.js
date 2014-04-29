@@ -16,13 +16,39 @@ $(document).ready(function(){
             }
         });
     }
-    load_meals();
+
+    function load_stage_meals() {
+        var meals = JSON.parse(localStorage.stage_meals);
+        var total_amount = 0;
+        var total_price = 0;
+        $.each(meals, function(){
+            total_amount += 1;
+            total_price += parseFloat(this.price);
+        });
+
+        $('#selected-stage-meals tr').remove();
+        var ractive = new Ractive({
+            el: 'selected-stage-meals',
+            template: '#selected-stage-meal-template',
+            data: {meals: meals, total: {price: total_price, amount: total_amount}},
+            complete: function() {
+                update_deliver_time_selector();
+            }
+        });
+    }
+
+    if ($('#selected_stage_meals').size() > 0) {
+        load_stage_meals();
+    } else if ($('#selected_meals').size() > 0) {
+        load_meals();
+    }
 
     // plus or minus meal amount
     $(document).on('click', '.plus-meal', function(){
         plus_meal($(this).data('id'));
         load_meals();
     });
+
     $(document).on('click', '.minus-meal', function(){
         var id = $(this).data('id');
         var amount = minus_meal(id);
@@ -62,6 +88,13 @@ $(document).ready(function(){
             }
         });
 
+        $('#selected-stage-meals .meal-type').each(function(){
+            var type = $(this).data('type');
+            if (type in time_selector) {
+                time_selector[type] = true;
+            }
+        });
+
         for (var type in time_selector) {
             if (!time_selector[type]) {
                 $('#{type}-deliver-time-select'.replace('{type}', type)).addClass('hidden');
@@ -73,29 +106,35 @@ $(document).ready(function(){
 
     // create order
     $('#create-order-btn').click(function(){
-        var btn = $(this);
-        var meals = get_meals().meals;
+        if ($('#selected_stage_meals').size() > 0) {
+            var meals = JSON.parse(localStorage.stage_meals);
+        } else if ($('#selected_meals').size() > 0) {
+            var meals = get_meals().meals;
+        }
+        var $btn = $(this);
         var building = $('#building').val();
         var location = $('#location').val();
         var breakfast_deliver_time = $('#breakfast-deliver-time-select:not(.hidden) select').val();
         var lunch_deliver_time = $('#lunch-deliver-time-select:not(.hidden) select').val();
         var supper_deliver_time = $('#supper-deliver-time-select:not(.hidden) select').val();
 
-        // update selected meal type
-        var all_meal_type_selected = true;
-        for (var i=0; i<meals.length; i++) {
-            var meal = meals[i];
-            var meal_type = $('input[name=meal-type-{id}]:checked'.replace('{id}', meal.id)).val();
-            if (!meal_type) {
-                $('#meal-{id} .meal-type'.replace('{id}', meal.id)).addClass('alert-danger');
-                all_meal_type_selected = false;
-            } else {
-                meal.meal_type = meal_type;
+        if ($('#selected_meals').size() > 0) {
+            // update selected meal type
+            var all_meal_type_selected = true;
+            for (var i=0; i<meals.length; i++) {
+                var meal = meals[i];
+                var meal_type = $('input[name=meal-type-{id}]:checked'.replace('{id}', meal.id)).val();
+                if (!meal_type) {
+                    $('#meal-{id} .meal-type'.replace('{id}', meal.id)).addClass('alert-danger');
+                    all_meal_type_selected = false;
+                } else {
+                    meal.meal_type = meal_type;
+                }
             }
-        }
-        if (!all_meal_type_selected) {
-            alert('我们还不知道您想什么时候吃，选一下早餐、午餐还是晚餐吧');
-            return;
+            if (!all_meal_type_selected) {
+                alert('我们还不知道您想什么时候吃，选一下早餐、午餐还是晚餐吧');
+                return;
+            }
         }
 
         if (location.length < 5) {
@@ -103,9 +142,9 @@ $(document).ready(function(){
             return;
         }
 
-        btn.button('loading');
+        $btn.button('loading');
         $.ajax({
-            url: '.',
+            url: $btn.data('url'),
             type: 'post',
             dataType: 'json',
             data: {
@@ -119,7 +158,7 @@ $(document).ready(function(){
             },
             success: function(result) {
                 clear_meals();
-                btn.button('reset');
+                $btn.button('reset');
                 window.location.href = result.success_url;
             }
         });

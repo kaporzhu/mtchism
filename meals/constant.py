@@ -3,3 +3,4 @@
 BREAKFAST = 'breakfast'
 LUNCH = 'lunch'
 SUPPER = 'supper'
+OTHER = 'other'

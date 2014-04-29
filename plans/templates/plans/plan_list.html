@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}所有计划{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-12">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>计划名</th>
+                    <th>激活</th>
+                    <th>阶段</th>
+                    <th>创建人</th>
+                    <th>创建时间</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for plan in object_list %}
+                <tr>
+                    <td>
+                        {{ plan.name }}
+                        <a href="{% url 'plans:update' pk=plan.id %}">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                        </a>
+                    </td>
+                    <td>{{ plan.is_active }}</td>
+                    <td>
+                        <table class="table table-bordered">
+                            <tr>
+                                <th>名字</th>
+                                <th>天数</th>
+                                <th>顺序</th>
+                                <th>套餐</th>
+                            </tr>
+                            {% for stage in plan.stage_set.all %}
+                            <tr>
+                                <td>{{ stage.name }}
+                                    <a href="{% url 'plans:update_stage' plan_pk=plan.id pk=stage.id %}">
+                                        <span class="glyphicon glyphicon-pencil"></span>
+                                    </a>
+                                </td>
+                                <td>{{ stage.days }}</td>
+                                <td>{{ stage.index }}</td>
+                                <td>
+                                    <a href="{% url 'plans:meal_list' plan_pk=plan.id stage_pk=stage.id %}">
+                                        <span class="glyphicon glyphicon-th-list"></span>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            <tr>
+                                <td colspan="3">
+                                    <a href="{% url 'plans:create_stage' plan_pk=plan.id %}">
+                                        <span class="glyphicon glyphicon-plus"></span>
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td>{{ plan.creator.username }}</td>
+                    <td>{{ plan.created_at|date:'m/d/Y H:i' }}</td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td colspan="5">
+                        <a href="{% url 'plans:create' %}">
+                            <span class="glyphicon glyphicon-plus"></span>
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

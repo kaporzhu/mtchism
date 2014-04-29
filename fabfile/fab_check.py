@@ -2,20 +2,28 @@
 import os
 import platform
 
-from fabric.api import local
-
 from django.conf import settings
+
+from fabric.api import local
 
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mtchism.settings")
 
 
-def test():
+def test(app=None, test=None):
     """
     Run the tests with trial
     """
-    for app in settings.LOCAL_APPS:
-        local('python manage.py test %s.tests' % app)
+    if app and test:
+        local('python manage.py test {}.tests.{} '
+              '--settings=mtchism.test_settings'.format(app, test))
+    elif app:
+        local('python manage.py test {}.tests '
+              '--settings=mtchism.test_settings'.format(app))
+    else:
+        for app in settings.LOCAL_APPS:
+            local('python manage.py test {}.tests '
+                  '--settings=mtchism.test_settings'.format(app))
 
 
 def coverage():
@@ -23,7 +31,8 @@ def coverage():
     Check tests coverage
     """
     apps = ' '.join(['%s.tests' % app for app in settings.LOCAL_APPS])
-    local('coverage run --source=. manage.py test %s' % apps)
+    local('coverage run --source=. manage.py test '
+          '--settings=mtchism.test_settings {}'.format(apps))
     local('coverage report')
     local('coverage html')
     if platform.system().lower() == 'windows':

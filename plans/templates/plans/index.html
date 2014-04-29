@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}所有计划{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-12">
+        {% if user_plans %}
+        <ul class="list-group">
+            {% for user_plan in user_plans %}
+                {% if user_plan.status == JOINED %}
+                <li class="list-group-item">
+                    {{ user_plan.plan.name }}
+                    <a href="{% url 'plans:start_userplan' pk=user_plan.id %}" class="btn btn-primary btn-xs pull-right">开始</a>
+                </li>
+                {% else %}
+                <a href="{% url 'plans:userplan_detail' pk=user_plan.id %}" class="list-group-item"><span class="glyphicon glyphicon-ok"></span> {{ user_plan.plan.name }}</a>
+                {% endif %}
+            {% endfor %}
+        </ul>
+        {% endif %}
+        <br />
+
+        {% if other_plans %}
+        <p><small>更多...</small></p>
+        <ul class="list-group">
+            {% for plan in other_plans %}
+            <li class="list-group-item">
+                {{ plan.name }}
+                <a href="{% url 'plans:join' pk=plan.id %}" class="btn btn-primary btn-xs pull-right">加入</a>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

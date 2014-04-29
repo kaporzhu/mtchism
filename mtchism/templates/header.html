@@ -24,14 +24,22 @@
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
           <ul class="nav navbar-nav">
-              <li>
-                  <a class="navbar-brand" href="{% url 'meals:index' %}">订餐</a>
+              {% url 'meals:index' as url %}
+              <li {% if request.path == url %}class="selected"{% endif %}>
+                  <a class="navbar-brand" href="{{ url }}">订餐</a>
+              </li>
+          </ul>
+          <ul class="nav navbar-nav">
+              {% url 'plans:index' as url %}
+              <li {% if request.path == url %}class="selected"{% endif %}>
+                  <a class="navbar-brand" href="{{ url }}">减肥计划</a>
               </li>
           </ul>
           {% if user.is_authenticated %}
           <ul class="nav navbar-nav">
-              <li>
-                  <a class="navbar-brand" href="{% url 'orders:mine' %}">我的订单</a>
+              {% url 'orders:mine' as url %}
+              <li {% if request.path == url %}class="selected"{% endif %}>
+                  <a class="navbar-brand" href="{{ url }}">我的订单</a>
               </li>
           </ul>
           {% endif %}
@@ -48,6 +56,9 @@
                 </li>
                 <li>
                   <a href="{% url 'buildings:list' %}">写字楼</a>
+                </li>
+                <li>
+                  <a href="{% url 'plans:list' %}">计划</a>
                 </li>
               </ul>
             </li>

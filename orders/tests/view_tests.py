@@ -12,6 +12,10 @@ from accounts.tests.factories import UserFactory
 from buildings.tests.factories import BuildingFactory
 from meals.constant import BREAKFAST, SUPPER, LUNCH
 from meals.tests.factories import MealFactory
+from plans.models import UserStageDay
+from plans.tests.factories import(
+    UserPlanFactory, StageFactory, StageMealFactory
+)
 from orders.constant import CANCELED, DONE
 from orders.forms import CheckoutForm
 from orders.models import Order
@@ -42,6 +46,7 @@ class CheckoutViewTests(TestCase):
         }
         request = RequestFactory()
         request.user = UserFactory()
+        request.GET = {}
         view = CheckoutView()
         view.request = request
         response = view.form_valid(form)
@@ -62,6 +67,25 @@ class CheckoutViewTests(TestCase):
         self.assertEqual(order_meal.meal_type, LUNCH)
         self.assertEqual(order_meal.deliver_time, form.cleaned_data['lunch_deliver_time'])
 
+        # request from user plan
+        building = BuildingFactory()
+        user_plan = UserPlanFactory()
+        stage = StageFactory(plan=user_plan.plan)
+        user_plan.start()
+        stage_meal = StageMealFactory(stage=stage)
+        request.GET = {'type': 'stage_meals', 'userplan': user_plan.id}
+        form.cleaned_data = {
+            'meals': [{'id': stage_meal.id, 'meal_type': LUNCH}],
+            'building': building.id, 'location': '',
+            'breakfast_deliver_time': '11:00-12:00',
+            'lunch_deliver_time': '11:00-12:00',
+            'supper_deliver_time': '',
+        }
+        response = view.form_valid(form)
+        self.assertTrue(json.loads(response.content)['success'])
+        order = Order.objects.get(building=building)
+        self.assertTrue(UserStageDay.objects.filter(order=order).exists())
+
     def _fake_get_context_data(self):
         """
         Return empty dict directly
@@ -75,8 +99,11 @@ class CheckoutViewTests(TestCase):
         Check if buildings, meal_type_choices and deliver times
         are added to the context
         """
+        request = RequestFactory()
+        request.GET = {}
         building = BuildingFactory()
         view = CheckoutView()
+        view.request = request
         data = view.get_context_data()
         self.assertEqual(
             sorted(data.keys()),

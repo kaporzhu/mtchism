@@ -16,6 +16,37 @@
 
 <div class="row">
 
+    {% if type == "stage_meals" %}
+    <div class="col-md-12" id="selected_stage_meals">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th class="col-md-6">套餐名</th>
+                    <th></th>
+                    <th>单价</th>
+                </tr>
+            </thead>
+            <tbody id="selected-stage-meals">
+            </tbody>
+        </table>
+        {% verbatim %}
+        <script id='selected-stage-meal-template' type='text/ractive'>
+            {{#meals}}
+            <tr id="meal-{{id}}">
+                <td>{{name}}</td>
+                <td class="meal-type" data-type="{{meal_type}}">{{category}}</td>
+                <td>{{price}}</td>
+            </tr>
+            {{/meals}}
+            {{#total}}
+            <tr class="text-right">
+                <td colspan="5">您一共选择了<b>{{amount}}</b>份套餐，总计<b>{{price}}</b>元</td>
+            </tr>
+            {{/total}}
+        </script>
+        {% endverbatim %}
+    </div>
+    {% else %}
     <div class="col-md-12" id="selected_meals">
         <table class="table table-bordered">
             <thead>
@@ -61,6 +92,8 @@
         </script>
         {% endverbatim %}
     </div>
+    {% endif %}
+
     <div class="col-md-12">
         <form class="form-inline" role="form">
             <div class="form-group">
@@ -112,8 +145,12 @@
                 {{ field }}
             </div>
         {% endfor %}
+        {% if type == "stage_meals" %}
+        <a id="back-to-meals-btn" href="{% url 'plans:booking' pk=userplan %}">返回继续添加</a>&nbsp;
+        {% else %}
         <a id="back-to-meals-btn" href="{% url 'meals:index' %}">返回继续添加</a>&nbsp;
-        <button type="button" data-loading-text="正在创建订单..." id="create-order-btn" type="button" class="btn btn-primary">下单</button>
+        {% endif %}
+        <button type="button" data-loading-text="正在创建订单..." id="create-order-btn" type="button" class="btn btn-primary" data-url="{% url 'orders:checkout' %}?type={{ type }}&userplan={{ userplan }}">下单</button>
     </form>
 </div>
 {% endblock %}

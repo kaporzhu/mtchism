@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block extracss %}
+<link rel="stylesheet" href="{% static 'css/booking.css' %}">
+{% endblock %}
+
+{% block extrajs %}
+<script src="{% static 'js/booking.js' %}"></script>
+{% endblock %}
+
+{% block title %}选择套餐{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-6">
+        {% for meal_group in meals %}
+        <div class="panel panel-default">
+            <div class="panel-heading">{{ meal_group.label }}</div>
+            <ul class="list-group">
+                {% for stage_meal in meal_group.meals %}
+                <label class="list-group-item">
+                    {{ stage_meal.meal.name }} - {{ stage_meal.meal.price }}<input type="{{ meal_group.input_type }}" name="{{ meal_group.name }}" value="{{ stage_meal.id }}" data-type="{{ meal_group.type }}" data-name="{{ stage_meal.meal.name }}" data-price="{{ stage_meal.meal.price }}" data-category="{{ meal_group.label }}" class="pull-right" />
+                </label>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">已选择的套餐</div>
+            <ul class="list-group" id="selected-meals">
+            </ul>
+        </div>
+        <div class="text-right">
+            <button id="checkbox" data-url="{% url 'orders:checkout' %}?type=stage_meals&userplan={{ pk }}" class="btn btn-primary"><span class="glyphicon glyphicon-shopping-cart"></span> 结算</button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

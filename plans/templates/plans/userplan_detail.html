@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block extracss %}
+<link rel="stylesheet" href="{% static 'timeliner/css/screen.css' %}">
+<link rel="stylesheet" href="{% static 'css/plan.css' %}">
+{% endblock %}
+
+{% block extrajs %}
+<script src="{% static 'timeliner/js/timeliner.min.js' %}"></script>
+<script src="{% static 'js/plan.js' %}"></script>
+{% endblock %}
+
+{% block title %}{{ object.plan.name }}{% endblock %}
+
+{% block content %}
+
+<div class="row" id="userplan-detail">
+    <div class="col-md-offset-1 col-md-11">
+        <div id="timelineContainer" class="timelineContainer">
+            {#<div class="timelineToggle"><p><a class="expandAll">+ expand all</a></p></div>#}
+            <br class="clear">
+            {% for user_stage in user_stages %}
+            <div class="timelineMajor">
+                <h2 class="timelineMajorMarker"><span>{{ user_stage.stage.name }}</span></h2>
+                {% for stage_day in user_stage.get_stage_days %}
+                <dl class="timelineMinor">
+                    {% if stage_day.status == FINISHED %}
+                    <dt>
+                        <label for="userstage_{{ stage_day.day.id }}EX" class="stage-date">{{ stage_day.date|date:"m月d日" }}</label>
+                        <span class="glyphicon glyphicon-ok"></span>
+                        {% if stage_day.day.weight %}
+                        <span class="badge input-weight-btn">{{ stage_day.day.weight|floatformat }}公斤</span>
+                        {% else %}
+                        <span class="badge input-weight-btn" title="点击输入">??公斤</span>
+                        {% endif %}
+                        <form class="form-inline input-weight-form" role="form" style="display:none;" data-stage-day="{{ stage_day.day.id }}" data-url="{% url 'plans:add_weight' plan_pk=object.id pk=stage_day.day.id %}">
+                            <div class="form-group">
+                                <input type="text" class="form-control input-sm weight" value="{{ stage_day.day.weight|floatformat|default_if_none:'' }}" />
+                            </div>
+                            <button type="button" class="btn btn-default btn-xs submit">提交</button>
+                        </form>
+                    </dt>
+                    <dd class="timelineEvent" id="userstage_{{ stage_day.day.id }}EX" style="display:none;">
+                        <p>
+                            {% for stage_meal in stage_day.day.get_meals.values %}
+                                <span>{{ stage_meal.label }}: </span>
+                                {% for meal in stage_meal.meals %}
+                                {{ meal.meal.name }}
+                                {% if not forloop.last %},{% endif %}
+                                {% endfor %}
+                                <br />
+                            {% endfor %}
+                        </p>
+                        <br class="clear">
+                    </dd>
+                    {% else %}
+                    <dt>
+                        <small>
+                            {% if stage_day.status == FAILED %}
+                                {{ stage_day.date|date:"m月d日" }}
+                                <span class="glyphicon glyphicon-remove"></span>
+                            {% elif stage_day.status == UPCOMING %}
+                                {{ stage_day.date|date:'m月d日' }}
+                                <a href="{% url 'plans:booking' pk=user_stage.id %}">
+                                    <span class="glyphicon glyphicon-shopping-cart"></span>订餐
+                                </a>
+                            {% else %}
+                                {{ stage_day.date|date:"m月d日" }}
+                                <span class="glyphicon glyphicon-time"></span>
+                            {% endif %}
+                        </small>
+                    </dt>
+                    {% endif %}
+                </dl>
+                {% endfor %}
+            </div>
+            {% endfor %}
+            <br class="clear">
+        </div>
+    </div>
+</div>
+{% endblock %}

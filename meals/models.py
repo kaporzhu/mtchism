@@ -4,7 +4,7 @@ import json
 from django.contrib.auth.models import User
 from django.db import models
 
-from .constant import LUNCH, BREAKFAST, SUPPER
+from .constant import LUNCH, BREAKFAST, SUPPER, OTHER
 from foods.models import Food
 
 
@@ -74,6 +74,7 @@ class Meal(models.Model):
         (BREAKFAST, u'早餐'),
         (LUNCH, u'午餐'),
         (SUPPER, u'晚餐'),
+        (OTHER, u'其他'),
     )
 
     MEAL_TYPES = {
@@ -120,3 +121,6 @@ class Meal(models.Model):
         Get categories label
         """
         return ','.join([cat.name for cat in self.categories.all()])
+
+    def __unicode__(self):
+        return u'{}[{}元]'.format(self.name, self.price)

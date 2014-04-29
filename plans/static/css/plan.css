@@ -1,0 +1,74 @@
+#userplan-detail {
+    font-size: 62.5%;
+}
+
+#userplan-detail h1, h2 {
+}
+
+#userplan-detail h1 {
+    font-size: 36px;
+    font-weight: 400;
+    margin: 0;
+}
+
+#userplan-detail h2 {
+    font-size: 22px;
+    font-weight: 400;
+    margin: 5px 0;
+    letter-spacing: .1em;
+}
+
+#userplan-detail h3 {
+    font-size: 1.6em;
+    margin: 10px 0 10px 10px;
+}
+
+#userplan-detail a:link, #userplan-detail a:visited {
+    color: #7097af;
+    text-decoration: none;
+}
+
+#userplan-detail a:hover {
+    color: #7DBADF;
+}
+
+#userplan-detail a img {
+    border: none;
+}
+
+#userplan-detail p {
+    margin: 0 0 10px 8px;
+    font-size: 1.5em;
+    font-weight: 400;
+    line-height: 1.6em;
+}
+
+#userplan-detail .lead {
+    font-size: 2em;
+    margin-bottom: 40px;
+}
+
+#userplan-detail .clear {
+    clear: both;
+    line-height: 0;
+    font-size: 0;
+}
+
+.input-weight-form {
+    display: inline-block;
+}
+
+.form-inline.input-weight-form .form-control {
+    height: 22px;
+    width: 50px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
+.stage-date {
+    cursor: pointer;
+}
+
+.input-weight-btn {
+    cursor: pointer;
+}

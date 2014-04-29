@@ -31,7 +31,7 @@ class Order(models.Model):
     breakfast_deliver_time = models.CharField(max_length=16, blank=True)
     lunch_deliver_time = models.CharField(max_length=16, blank=True)
     supper_deliver_time = models.CharField(max_length=16, blank=True)
-    deliver_date = models.DateField(auto_now_add=True)
+    deliver_date = models.DateField()
     creator = models.ForeignKey(User)
     created_at = models.DateTimeField(auto_now_add=True)
 

@@ -54,3 +54,4 @@ doc/_build/
 
 local_settings.py
 .settings/
+test_settings.py

@@ -10,6 +10,7 @@ urlpatterns = patterns(
     url(r'^buildings/', include('buildings.urls', 'buildings', 'buildings')),
     url(r'^foods/', include('foods.urls', 'foods', 'foods')),
     url(r'^meals/', include('meals.urls', 'meals', 'meals')),
+    url(r'^plans/', include('plans.urls', 'plans', 'plans')),
     url(r'^orders/', include('orders.urls', 'orders', 'orders')),
 
     url(r'^admin/', include(admin.site.urls)),

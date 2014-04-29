@@ -21,8 +21,9 @@ from .forms import CheckoutForm
 from .models import Order, OrderMeal
 from .utils import get_tomorrow
 from buildings.models import Building
-from meals.constant import BREAKFAST, SUPPER, LUNCH
+from meals.constant import BREAKFAST, SUPPER, LUNCH, OTHER
 from meals.models import Meal
+from plans.models import UserPlan, StageMeal, UserStageDay
 
 
 class CheckoutView(LoginRequiredMixin, JSONResponseMixin, FormView):
@@ -41,6 +42,7 @@ class CheckoutView(LoginRequiredMixin, JSONResponseMixin, FormView):
                      'deliver_times': collections.OrderedDict(sorted(DELIVER_TIMES.items())),  # noqa
                      'meal_type_choices': Meal.MEAL_TYPE_CHOICES,
                      'tomorrow': get_tomorrow()})
+        data.update(self.request.GET.items())
         return data
 
     def form_valid(self, form):
@@ -53,6 +55,7 @@ class CheckoutView(LoginRequiredMixin, JSONResponseMixin, FormView):
             BREAKFAST: data.get('breakfast_deliver_time'),
             LUNCH: data.get('lunch_deliver_time'),
             SUPPER: data.get('supper_deliver_time'),
+            OTHER: None
         }
         building = Building.objects.get(pk=data['building'])
 
@@ -70,28 +73,52 @@ class CheckoutView(LoginRequiredMixin, JSONResponseMixin, FormView):
                       building=building,
                       breakfast_deliver_time=deliver_times[BREAKFAST],
                       lunch_deliver_time=deliver_times[LUNCH],
-                      supper_deliver_time=deliver_times[SUPPER])
+                      supper_deliver_time=deliver_times[SUPPER],
+                      deliver_date=get_tomorrow())
         order.save()
         total_price = 0
         total_amount = 0
-        for meal_info in data['meals']:
-            amount = meal_info['amount']
-            meal = Meal.objects.get(pk=meal_info['id'])
-            deliver_time = deliver_times[meal_info['meal_type']]
-            total_price += meal.price * amount
-            total_amount += amount
-            order_meal = OrderMeal(meal=meal,
-                                   creator=self.request.user,
-                                   order=order,
-                                   amount=meal_info['amount'],
-                                   meal_type=meal_info['meal_type'],
-                                   deliver_time=deliver_time
-                                   )
-            order_meal.save()
+
+        if 'stage_meals' == self.request.GET.get('type'):
+            user_plan = UserPlan.objects.get(pk=self.request.GET['userplan'])
+            stage_day = UserStageDay(user=self.request.user,
+                                     user_stage=user_plan.current_stage,
+                                     order=order,
+                                     date=order.deliver_date)
+            stage_day.save()
+            user_plan.validate()
+            for stage_meal_info in data['meals']:
+                stage_meal = StageMeal.objects.get(pk=stage_meal_info['id'])
+                stage_day.meals.add(stage_meal)
+                deliver_time = deliver_times[stage_meal_info['meal_type']]
+                total_price += stage_meal.meal.price
+                total_amount += 1
+                order_meal = OrderMeal(meal=stage_meal.meal,
+                                       creator=self.request.user,
+                                       order=order,
+                                       amount=1,
+                                       meal_type=stage_meal_info['meal_type'])
+                if deliver_time:
+                    order_meal.deliver_time = deliver_time
+                order_meal.save()
+
+        else:
+            for meal_info in data['meals']:
+                amount = meal_info['amount']
+                meal = Meal.objects.get(pk=meal_info['id'])
+                deliver_time = deliver_times[meal_info['meal_type']]
+                total_price += meal.price * amount
+                total_amount += amount
+                order_meal = OrderMeal(meal=meal,
+                                       creator=self.request.user,
+                                       order=order,
+                                       amount=meal_info['amount'],
+                                       meal_type=meal_info['meal_type'],
+                                       deliver_time=deliver_time)
+                order_meal.save()
+
         order.total_price = total_price
         order.total_amount = total_amount
-
-        order.deliver_date = get_tomorrow()
 
         order.save()
 
@@ -112,7 +139,8 @@ class MyOrderView(LoginRequiredMixin, TemplateView):
         Add my orders to the context
         """
         data = super(MyOrderView, self).get_context_data(**kwargs)
-        orders = Order.objects.filter(creator=self.request.user)[:15]
+        orders = Order.objects.filter(
+            creator=self.request.user).order_by('-deliver_date')[:30]
         orders_tomorrow = []
         orders_today = []
         order_yesterday = []
