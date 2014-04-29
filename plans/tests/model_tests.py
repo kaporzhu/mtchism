@@ -12,6 +12,7 @@ from plans.constants import(
     WAITING, BREAKFAST, LUNCH, SUPPER
 )
 from plans.models import UserStage
+from plans.tests.factories import UserStageFactory
 
 
 class PlanTests(TestCase):
@@ -26,6 +27,10 @@ class PlanTests(TestCase):
         stage_one = StageFactory(plan=plan, days=1)
         stage_two = StageFactory(plan=plan, days=2)
         self.assertEqual(plan.days, stage_one.days + stage_two.days)
+
+    def test_unicode(self):
+        plan = PlanFactory()
+        self.assertEqual(str(plan), plan.name)
 
 
 class UserPlanTests(TestCase):
@@ -104,6 +109,12 @@ class UserPlanTests(TestCase):
         self.assertTrue(
             UserStage.objects.filter(status=DONE, stage=stage_one).exists())
 
+    def test_unicode(self):
+        user_plan = UserPlanFactory()
+        self.assertEqual(
+            str(user_plan),
+            u'{}-{}'.format(user_plan.user.username, user_plan.plan))
+
 
 class UserStageTests(TestCase):
     """
@@ -130,6 +141,12 @@ class UserStageTests(TestCase):
         self.assertEqual(days[1]['status'], FINISHED)
         self.assertEqual(days[2]['status'], WAITING)
 
+    def test_unicode(self):
+        user_stage = UserStageFactory()
+        self.assertEqual(
+            str(user_stage),
+            u'{}-{}'.format(user_stage.user.username, user_stage.stage))
+
 
 class UserStageDayTests(TestCase):
     """
@@ -150,3 +167,20 @@ class UserStageDayTests(TestCase):
         self.assertIn(breakfast, meals[BREAKFAST]['meals'])
         self.assertIn(lunch, meals[LUNCH]['meals'])
         self.assertIn(supper, meals[SUPPER]['meals'])
+
+    def test_unicode(self):
+        day = UserStageDayFactory()
+        self.assertEqual(
+            str(day),
+            u'{}-{}-{}'.format(day.user.username, day.user_stage.stage,
+                               day.date))
+
+
+class StageMealTests(TestCase):
+    """
+    Tests for StageMeal model
+    """
+    def test_unicode(self):
+        stage_meal = StageMealFactory()
+        self.assertEqual(unicode(stage_meal),
+                         u'{}-{}'.format(stage_meal.stage, stage_meal.meal))

@@ -8,6 +8,9 @@ class Category(models.Model):
     """
     name = models.CharField(max_length=128)
 
+    def __unicode__(self):
+        return self.name
+
 
 class Food(models.Model):
     """
@@ -22,3 +25,6 @@ class Food(models.Model):
     fat = models.FloatField(default=-1)  # 脂肪（克）
     protein = models.FloatField(default=-1)  # 蛋白质（克）
     cellulose = models.FloatField(default=-1)  # 纤维素（克）
+
+    def __unicode__(self):
+        return self.name

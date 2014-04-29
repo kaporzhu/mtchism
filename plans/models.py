@@ -35,6 +35,9 @@ class Plan(models.Model):
             days += stage.days
         return days
 
+    def __unicode__(self):
+        return self.name
+
 
 class Stage(models.Model):
     """
@@ -47,6 +50,9 @@ class Stage(models.Model):
 
     creator = models.ForeignKey(User)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __unicode__(self):
+        return u'{}-{}'.format(self.plan, self.name)
 
 
 class StageMeal(models.Model):
@@ -67,6 +73,9 @@ class StageMeal(models.Model):
 
     creator = models.ForeignKey(User)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __unicode__(self):
+        return u'{}-{}'.format(self.stage, self.meal)
 
 
 class UserPlan(models.Model):
@@ -163,6 +172,9 @@ class UserPlan(models.Model):
                     next_stage.save()
                     self.current_stage = next_stage
 
+    def __unicode__(self):
+        return u'{}-{}'.format(self.user.username, self.plan)
+
 
 class UserStage(models.Model):
     """
@@ -217,6 +229,9 @@ class UserStage(models.Model):
             date += timedelta(days=1)
         return days
 
+    def __unicode__(self):
+        return u'{}-{}'.format(self.user.username, self.stage)
+
 
 class UserStageDay(models.Model):
     """
@@ -238,3 +253,7 @@ class UserStageDay(models.Model):
         for meal in self.meals.all():
             meals_grouped[meal.category]['meals'].append(meal)
         return meals_grouped
+
+    def __unicode__(self):
+        return u'{}-{}-{}'.format(self.user.username, self.user_stage.stage,
+                                  self.date)

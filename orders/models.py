@@ -66,6 +66,9 @@ class Order(models.Model):
                 return choice[1]
         raise ValueError('Invalid status value')
 
+    def __unicode__(self):
+        return u'{}-{}'.format(self.building, self.creator.username)
+
 
 class OrderMeal(models.Model):
     """
@@ -80,3 +83,6 @@ class OrderMeal(models.Model):
 
     creator = models.ForeignKey(User)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __unicode__(self):
+        return u'{}-{}'.format(self.order, self.meal.name)

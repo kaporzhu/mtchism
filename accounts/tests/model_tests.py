@@ -15,3 +15,12 @@ class SignalTests(TestCase):
         """
         user = UserFactory()
         self.assertTrue(Profile.objects.filter(user=user).exists())
+
+
+class ProfileTests(TestCase):
+    """
+    Tests for Profile model
+    """
+    def test_unicode(self):
+        user = UserFactory()
+        self.assertEqual(str(user.profile), user.username)

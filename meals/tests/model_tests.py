@@ -28,6 +28,20 @@ class DishTests(TestCase):
         for name in ['carbohydrate', 'fat', 'protein', 'cellulose']:
             self.assertTrue(elements[name] == '-')
 
+    def test_unicode(self):
+        dish = DishFactory()
+        self.assertEqual(str(dish), dish.name)
+
+
+class DishFoodTests(TestCase):
+    """
+    Tests for DishFood model
+    """
+    def test_unicode(self):
+        dish_food = DishFoodFactory()
+        self.assertEqual(str(dish_food),
+                         u'{}-{}'.format(dish_food.dish, dish_food.food.name))
+
 
 class MealCategoryTests(TestCase):
     """

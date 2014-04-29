@@ -4,6 +4,7 @@ from django.test.testcases import TestCase
 from .factories import OrderFactory
 from orders.constant import CREATED, PAID
 from orders.models import Order
+from orders.tests.factories import OrderMealFactory
 
 
 class OrderTests(TestCase):
@@ -31,3 +32,20 @@ class OrderTests(TestCase):
         """
         self.assertEqual(u'等待付款', Order.get_status_label(CREATED))
         self.assertRaises(ValueError, lambda: Order.get_status_label('!!!'))
+
+    def test_unicode(self):
+        order = OrderFactory()
+        self.assertEqual(
+            str(order),
+            u'{}-{}'.format(order.building, order.creator.username))
+
+
+class OrderMealTests(TestCase):
+    """
+    Tests for OrderMeal model
+    """
+    def test_unicode(self):
+        order_meal = OrderMealFactory()
+        self.assertEqual(
+            str(order_meal),
+            u'{}-{}'.format(order_meal.order, order_meal.meal.name))

@@ -17,6 +17,9 @@ class Profile(models.Model):
     preferred_lunch_time = models.CharField(max_length=16, blank=True)
     preferred_supper_time = models.CharField(max_length=16, blank=True)
 
+    def __unicode__(self):
+        return self.user.username
+
 
 def create_user_profile(sender, instance, created, **kwargs):
     """

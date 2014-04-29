@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.test.testcases import TestCase
 
-from .factories import TagFactory
+from .factories import TagFactory, BuildingFactory
 
 
 class TagTests(TestCase):
@@ -14,3 +14,12 @@ class TagTests(TestCase):
         """
         tag = TagFactory.build(name='tag')
         self.assertTrue(tag.name == str(tag))
+
+
+class BuildingTests(TestCase):
+    """
+    Tests for Building model
+    """
+    def test_unicode(self):
+        building = BuildingFactory.build()
+        self.assertEqual(str(building), building.name)

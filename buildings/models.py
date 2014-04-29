@@ -22,3 +22,6 @@ class Building(models.Model):
     tips = models.TextField(u'备注', blank=True)
     tags = models.ManyToManyField(to=Tag, verbose_name=u'分类')
     is_active = models.BooleanField(u'开放购买', default=True)
+
+    def __unicode__(self):
+        return self.name

@@ -43,6 +43,9 @@ class Dish(models.Model):
 
         return elements
 
+    def __unicode__(self):
+        return self.name
+
 
 class DishFood(models.Model):
     """
@@ -54,6 +57,9 @@ class DishFood(models.Model):
 
     creator = models.ForeignKey(User)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __unicode__(self):
+        return u'{}-{}'.format(self.dish, self.food.name)
 
 
 class MealCategory(models.Model):
