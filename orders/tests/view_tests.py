@@ -65,7 +65,8 @@ class CheckoutViewTests(TestCase):
         self.assertTrue(order.ordermeal_set.filter(meal=meal).exists())
         order_meal = order.ordermeal_set.get(meal=meal)
         self.assertEqual(order_meal.meal_type, LUNCH)
-        self.assertEqual(order_meal.deliver_time, form.cleaned_data['lunch_deliver_time'])
+        self.assertEqual(order_meal.deliver_time,
+                         form.cleaned_data['lunch_deliver_time'])
 
         # request from user plan
         building = BuildingFactory()

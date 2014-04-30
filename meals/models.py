@@ -4,7 +4,7 @@ import json
 from django.contrib.auth.models import User
 from django.db import models
 
-from .constant import LUNCH, BREAKFAST, SUPPER, OTHER
+from .constant import LUNCH, BREAKFAST, SUPPER, OTHER, NORMAL, PLAN
 from foods.models import Food
 
 
@@ -62,16 +62,6 @@ class DishFood(models.Model):
         return u'{}-{}'.format(self.dish, self.food.name)
 
 
-class MealCategory(models.Model):
-    """
-    Meal category
-    """
-    name = models.CharField(max_length=64)
-
-    def __unicode__(self):
-        return self.name
-
-
 class Meal(models.Model):
     """
     Each meal in a day.
@@ -89,12 +79,18 @@ class Meal(models.Model):
         SUPPER: u'晚餐',
     }
 
+    MEAL_CATEGORY_CHOICES = (
+        (NORMAL, u'普通套餐'),
+        (PLAN, u'计划套餐'),
+    )
+
     name = models.CharField(max_length=128)
     dishes = models.ManyToManyField(Dish)
     price = models.FloatField(default=0)
     # breakfast, lunch, supper. Seperate with comma
     limitations = models.CharField(max_length=64, blank=True)
-    categories = models.ManyToManyField(MealCategory)
+    category = models.CharField(max_length=32, db_index=True,
+                                choices=MEAL_CATEGORY_CHOICES, default=NORMAL)
 
     is_active = models.BooleanField(default=True)
     creator = models.ForeignKey(User)
@@ -121,12 +117,6 @@ class Meal(models.Model):
                 if limit in self.MEAL_TYPES:
                     limitations.append(self.MEAL_TYPES[limit])
         return ','.join(limitations)
-
-    def get_categories_display(self):
-        """
-        Get categories label
-        """
-        return ','.join([cat.name for cat in self.categories.all()])
 
     def __unicode__(self):
         return u'{}[{}元]'.format(self.name, self.price)
