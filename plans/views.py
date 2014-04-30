@@ -151,7 +151,7 @@ class UpdateMealView(StaffuserRequiredMixin, UpdateView):
 
     def get_success_url(self):
         kwargs = {'plan_pk': self.kwargs['plan_pk'],
-                  'stage_pk': self.kwargs['stage_pk'],}
+                  'stage_pk': self.kwargs['stage_pk']}
         return reverse('plans:meal_list', kwargs=kwargs)
 
 
@@ -228,10 +228,10 @@ class BookingView(LoginRequiredMixin, TemplateView):
         data = super(BookingView, self).get_context_data(**kwargs)
         data.update(self.kwargs)
         user_plan = UserPlan.objects.get(pk=self.kwargs['pk'])
-        breakfasts = user_plan.current_stage.stage.stagemeal_set.filter(category=BREAKFAST)
-        lunches = user_plan.current_stage.stage.stagemeal_set.filter(category=LUNCH)
-        suppers = user_plan.current_stage.stage.stagemeal_set.filter(category=SUPPER)
-        others = user_plan.current_stage.stage.stagemeal_set.filter(category=OTHER)
+        breakfasts = user_plan.current_stage.stage.stagemeal_set.filter(category=BREAKFAST)  # noqa
+        lunches = user_plan.current_stage.stage.stagemeal_set.filter(category=LUNCH)  # noqa
+        suppers = user_plan.current_stage.stage.stagemeal_set.filter(category=SUPPER)  # noqa
+        others = user_plan.current_stage.stage.stagemeal_set.filter(category=OTHER)  # noqa
         meals = [
             {
                 'label': u'早饭',

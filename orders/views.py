@@ -249,7 +249,6 @@ class OrderListView(StaffuserRequiredMixin, ListView):
         else:
             building_Q = Q()
 
-
         # deliver time
         meal_type = params['meal_type']
         deliver_time = params['deliver_time']
