@@ -16,12 +16,12 @@ from plans.models import UserStageDay
 from plans.tests.factories import(
     UserPlanFactory, StageFactory, StageMealFactory
 )
-from orders.constant import CANCELED, DONE
+from orders.constant import CANCELED, DONE, PAID
 from orders.forms import CheckoutForm
 from orders.models import Order
 from orders.views import(
     CheckoutView, MyOrderView, CancelOrderView, UpdateOrderStatusView,
-    OrderListView
+    OrderListView, PayView
 )
 
 
@@ -352,3 +352,19 @@ class UpdateOrderStatusViewTests(TestCase):
         response = view.get_ajax(request)
         self.assertTrue(json.loads(response.content)['success'])
         self.assertTrue(Order.objects.get(pk=order.id).status == DONE)
+
+
+class PayViewTests(TestCase):
+    """
+    Tests for PayView
+    """
+    def test_get(self):
+        """
+        Check if the order status is changed to PAID
+        """
+        order = OrderFactory()
+        view = PayView()
+        request = RequestFactory()
+        request.user = order.creator
+        view.get(request, pk=order.id)
+        self.assertEqual(Order.objects.get(id=order.id).status, PAID)

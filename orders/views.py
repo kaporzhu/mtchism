@@ -3,7 +3,7 @@ import collections
 import json
 from datetime import datetime
 
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, reverse_lazy
 from django.db.models import Q
 from django.shortcuts import redirect
 from django.views.generic.base import TemplateView, RedirectView, View
@@ -16,7 +16,7 @@ from braces.views import(
     AjaxResponseMixin
 )
 
-from .constant import CANCELED, DELIVER_TIMES
+from .constant import CANCELED, DELIVER_TIMES, PAID
 from .forms import CheckoutForm
 from .models import Order, OrderMeal
 from .utils import get_tomorrow
@@ -308,3 +308,20 @@ class UpdateOrderStatusView(StaffuserRequiredMixin, JSONResponseMixin,
         orders.update(status=status)
         return self.render_json_response(
             {'success': True, 'new_status': Order.get_status_label(status)})
+
+
+class PayView(LoginRequiredMixin, RedirectView):
+    """
+    Fake payment view.
+    Simply set the order to paid.
+    """
+    permanent = False
+
+    def get(self, request, *args, **kwargs):
+        """
+        Update order status here.
+        """
+        order = Order.objects.get(pk=kwargs['pk'], creator=request.user)
+        order.status = PAID
+        order.save()
+        return redirect(reverse('orders:mine'))
