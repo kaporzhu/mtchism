@@ -6,4 +6,5 @@ omit =
     mtchism/local_settings.py
     mtchism/settings.py
     mtchism/wsgi.py
+    mtchism/load_foods.py
     */constants.py

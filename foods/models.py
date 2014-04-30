@@ -18,6 +18,9 @@ class Food(models.Model):
     """
     name = models.CharField(max_length=128)
     category = models.ForeignKey(Category)
+    origin_id = models.IntegerField(db_index=True, blank=True, null=True)
+    url = models.URLField(blank=True, null=True)
+    image_url = models.URLField(blank=True, null=True)
 
     # 营养信息(每100克)
     heat = models.FloatField(default=-1)  # 热量（大卡）
