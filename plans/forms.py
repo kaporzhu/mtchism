@@ -2,6 +2,7 @@
 from django import forms
 
 from .models import Plan, Stage, StageMeal
+from meals.constant import PLAN
 
 
 class PlanForm(forms.ModelForm):
@@ -29,3 +30,11 @@ class StageMealForm(forms.ModelForm):
     class Meta:
         model = StageMeal
         fields = ('category', 'meal',)
+
+    def __init__(self, *args, **kwargs):
+        """
+        Limit meal field
+        """
+        super(StageMealForm, self).__init__(*args, **kwargs)
+        meal_field = self.fields['meal']
+        meal_field.queryset = meal_field.queryset.filter(category=PLAN)

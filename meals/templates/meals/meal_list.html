@@ -22,11 +22,11 @@
                 <span>类别：</span>
                 <select name="category" class="form-control">
                     <option value="all">所有类别</option>
-                    {% for cat in categories %}
-                        {% if cat.id|lower == category %}
-                        <option value="{{ cat.id }}" selected="selected">{{ cat.name }}</option>
+                    {% for choice in category_choices %}
+                        {% if choice.0 == category %}
+                        <option value="{{ choice.0 }}" selected="selected">{{ choice.1 }}</option>
                         {% else %}
-                        <option value="{{ cat.id }}">{{ cat.name }}</option>
+                        <option value="{{ choice.0 }}">{{ choice.1 }}</option>
                         {% endif %}
                     {% endfor %}
                 </select>
@@ -45,7 +45,7 @@
                 {% for meal in object_list %}
                 <tr>
                     <td>
-                        {{ meal.name }}({{ meal.price }})<small>[{{ meal.get_limitations_display }}][{{ meal.get_categories_display }}]</small>
+                        {{ meal.name }}({{ meal.price }})<small>[{{ meal.get_limitations_display }}][{{ meal.get_category_display }}]</small>
                         <a href="{% url 'meals:update' pk=meal.id %}">
                             <span class="glyphicon glyphicon-pencil"></span>
                         </a>

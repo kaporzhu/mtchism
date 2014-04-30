@@ -9,8 +9,9 @@ from .factories import(
     UserStageDayFactory
 )
 from accounts.tests.factories import UserFactory
+from meals.constant import PLAN
 from meals.tests.factories import MealFactory
-from plans.constants import BREAKFAST, RUNNING, LUNCH, SUPPER, OTHER
+from plans.constants import BREAKFAST, RUNNING
 from plans.forms import PlanForm, StageForm, StageMealForm
 from plans.models import Plan, Stage, UserPlan, StageMeal, UserStageDay
 from plans.views import(
@@ -161,7 +162,7 @@ class CreateMealViewTests(TestCase):
         Check if the new stage meal is created
         """
         stage = StageFactory()
-        meal = MealFactory()
+        meal = MealFactory(category=PLAN)
         request = RequestFactory()
         request.user = UserFactory()
         view = CreateMealView()

@@ -7,7 +7,6 @@ from .factories import DishFactory, DishFoodFactory, MealFactory
 from foods.tests.factories import FoodFactory
 from meals.constant import LUNCH, BREAKFAST, SUPPER
 from meals.models import Meal
-from meals.tests.factories import MealCategoryFactory
 
 
 class DishTests(TestCase):
@@ -43,18 +42,6 @@ class DishFoodTests(TestCase):
                          u'{}-{}'.format(dish_food.dish, dish_food.food.name))
 
 
-class MealCategoryTests(TestCase):
-    """
-    Tests for MealCategory
-    """
-    def test_unicode(self):
-        """
-        Check if the category name is returned
-        """
-        cat = MealCategoryFactory(name='cat')
-        self.assertEqual('cat', str(cat))
-
-
 class MealTests(TestCase):
     """
     Tests for model Meal
@@ -74,17 +61,6 @@ class MealTests(TestCase):
         """
         meal = MealFactory(limitations='["{}","{}","{}"]'.format(BREAKFAST, LUNCH, SUPPER))  # noqa
         self.assertEqual(meal.get_limitations_display(), u'早餐,午餐,晚餐')
-
-    def test_get_categories_display(self):
-        """
-        Check if the categories label is returned
-        """
-        cat1 = MealCategoryFactory(name='cat1')
-        cat2 = MealCategoryFactory(name='cat2')
-        meal = MealFactory(limitations='["{}"]'.format(LUNCH))
-        meal.categories.add(cat1)
-        meal.categories.add(cat2)
-        self.assertEqual(meal.get_categories_display(), 'cat1,cat2')
 
     def test_unicode(self):
         """

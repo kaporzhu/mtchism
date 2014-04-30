@@ -17,7 +17,7 @@ class SearchFoodView(JSONResponseMixin, AjaxResponseMixin, FormView):
         """
         Search the food here
         """
-        return Food.objects.filter(name__contains=keyword)[:5]
+        return Food.objects.filter(name__contains=keyword)[:10]
 
     def get_ajax(self, request, *args, **kwargs):
         """

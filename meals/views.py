@@ -11,8 +11,9 @@ from braces.views import(
     StaffuserRequiredMixin, SetHeadlineMixin
 )
 
+from .constant import NORMAL
 from .forms import MealForm, DishForm, UpdateDishFoodsForm
-from .models import Meal, Dish, DishFood, MealCategory
+from .models import Meal, Dish, DishFood
 from foods.models import Food
 
 
@@ -68,7 +69,7 @@ class MealListView(StaffuserRequiredMixin, ListView):
         Add extra data to context
         """
         data = super(MealListView, self).get_context_data(**kwargs)
-        data.update({'categories': MealCategory.objects.all(),
+        data.update({'category_choices': Meal.MEAL_CATEGORY_CHOICES,
                      'meal_type_choices': Meal.MEAL_TYPE_CHOICES})
         data.update(self.request.GET.dict())
         return data
@@ -80,11 +81,11 @@ class MealListView(StaffuserRequiredMixin, ListView):
         qs = super(MealListView, self).get_queryset()
 
         # category
-        cat_id = self.request.GET.get('category', 'all')
-        if cat_id == 'all':
+        category = self.request.GET.get('category', 'all')
+        if category == 'all':
             category_Q = Q()
         else:
-            category_Q = Q(categories=MealCategory.objects.get(pk=cat_id))
+            category_Q = Q(category=category)
 
         # meal type
         meal_type = self.request.GET.get('meal_type', 'all')
@@ -195,11 +196,7 @@ class MealIndexView(TemplateView):
         Add extra data to context
         """
         data = super(MealIndexView, self).get_context_data(**kwargs)
-        # get meals by category
-        category_id = int(self.request.GET.get('cat', '1'))
-        category = MealCategory.objects.get(pk=category_id)
-        data.update({'meals': Meal.objects.filter(is_active=True, categories=category),  # noqa
-                     'category_id': category_id,
-                     'meal_types': Meal.MEAL_TYPES,
-                     'meal_categories': MealCategory.objects.all()})
+        data.update({
+            'meals': Meal.objects.filter(is_active=True, category=NORMAL)
+        })
         return data

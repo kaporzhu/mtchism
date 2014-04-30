@@ -12,7 +12,7 @@ class MealForm(forms.ModelForm):
     """
     class Meta:
         model = Meal
-        fields = ('name', 'price', 'limitations', 'categories', 'is_active')
+        fields = ('name', 'price', 'limitations', 'category', 'is_active')
         widgets = {
             'name': forms.TextInput(
                 attrs={'class': 'form-control', 'placeholder': '套餐名'}),

@@ -150,7 +150,9 @@ class UpdateMealView(StaffuserRequiredMixin, UpdateView):
     form_class = StageMealForm
 
     def get_success_url(self):
-        return reverse('plans:meal_list', kwargs=self.kwargs)
+        kwargs = {'plan_pk': self.kwargs['plan_pk'],
+                  'stage_pk': self.kwargs['stage_pk'],}
+        return reverse('plans:meal_list', kwargs=kwargs)
 
 
 class MealListView(StaffuserRequiredMixin, ListView):
