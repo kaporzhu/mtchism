@@ -17,7 +17,7 @@ class Order(models.Model):
 
     STATUS_CHOICES = (
         (CREATED, u'等待付款'),
-        (PAID, u'等待配送'),
+        (PAID, u'进行中'),
         (DONE, u'已完成'),
         (CANCELED, u'已取消'),
     )
@@ -49,7 +49,7 @@ class Order(models.Model):
                          'data-message="确定要取消？" class="confirm btn '\
                          'btn-default btn-xs pull-right">'\
                          '取消订单</a>'.format(cancel_url)
-            pay_url = '#'
+            pay_url = reverse('orders:pay', kwargs={'pk': self.id})
             pay_btn = '<a href="{}" class="btn btn-primary btn-xs '\
                       'pull-right">马上支付</a>'.format(pay_url)
             return '{}{}'.format(cancel_btn, pay_btn)
