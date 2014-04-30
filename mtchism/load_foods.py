@@ -16,7 +16,7 @@ from foods.models import Category, Food
 
 with open('boohee_2014_04_29_18_51_17.json') as data_file:
     for line in data_file.readlines():
-        fd = json.loads(line.strip('[],\n'))
+        fd = json.loads(line.strip('[],\n\r'))
         category, cat_created = Category.objects.get_or_create(
                     name=fd['category_name'])
         origin_id = int(re.match('.*shiwu/(\d*)', fd['url']).group(1))

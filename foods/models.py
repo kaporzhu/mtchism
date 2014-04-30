@@ -16,7 +16,7 @@ class Food(models.Model):
     """
     Model for food material.
     """
-    name = models.CharField(max_length=128)
+    name = models.CharField(max_length=128, db_index=True)
     category = models.ForeignKey(Category)
     origin_id = models.IntegerField(db_index=True, blank=True, null=True)
     url = models.URLField(blank=True, null=True)
