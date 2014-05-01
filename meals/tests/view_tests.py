@@ -269,7 +269,8 @@ class MealListViewTests(TestCase):
         view.request = request
         data = view.get_context_data()
         self.assertEqual(
-            sorted(['category_choices', 'meal_type_choices', 'test']),
+            sorted(['category_choices', 'meal_type_choices', 'test',
+                    'query_string']),
             sorted(data.keys()))
 
     def test_get_queryset(self):

@@ -129,6 +129,7 @@ class UserStageTests(TestCase):
         user_plan = UserPlanFactory(plan=plan, status=JOINED)
         user_plan.start()
         user_stage = UserStage.objects.get(stage=stage)
+        user_stage.started_at = user_stage.started_at - timedelta(days=1)
         days = user_stage.get_stage_days()
         self.assertEqual(len(days), user_stage.days)
         self.assertEqual(days[0]['status'], FAILED)

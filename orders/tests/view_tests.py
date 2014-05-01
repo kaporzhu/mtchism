@@ -23,6 +23,7 @@ from orders.views import(
     CheckoutView, MyOrderView, CancelOrderView, UpdateOrderStatusView,
     OrderListView, PayView
 )
+from django.http.request import QueryDict
 
 
 class CheckoutViewTests(TestCase):
@@ -326,7 +327,7 @@ class OrderListViewTests(TestCase):
         Check if the status_choices and request params are added to the context
         """
         request = RequestFactory()
-        request.GET = {}
+        request.GET = QueryDict('')
         view = OrderListView()
         view.request = request
         self.assertEqual(sorted(view.get_context_data().keys()),
@@ -334,7 +335,7 @@ class OrderListViewTests(TestCase):
                                  'buildings', 'location', 'created_start_dt',
                                  'created_end_dt', 'deliver_times',
                                  'deliver_time', 'meal_type_choices',
-                                 'meal_type']))
+                                 'meal_type', 'query_string']))
 
 
 class UpdateOrderStatusViewTests(TestCase):
