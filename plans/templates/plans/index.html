@@ -8,11 +8,11 @@
     <div class="col-md-12">
         <div class="row">
             {% for user_plan in user_plans %}
-                {% if forloop.counter0|divisibleby:"3" %}
+                {% if forloop.counter0|divisibleby:"2" %}
                 </div>
                 <div class="row">
                 {% endif %}
-                <div class="col-sm-4">
+                <div class="col-sm-6">
                     <div class="plan panel panel-default">
                         <div class="panel-heading"><strong>{{ user_plan.plan.name }}</strong></div>
                         <div class="panel-body">

@@ -3,7 +3,7 @@ import collections
 import json
 from datetime import datetime
 
-from django.core.urlresolvers import reverse, reverse_lazy
+from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.shortcuts import redirect
 from django.views.generic.base import TemplateView, RedirectView, View
