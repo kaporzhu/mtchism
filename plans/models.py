@@ -110,7 +110,7 @@ class UserPlan(models.Model):
         """
         if self.status == JOINED:
             self.status = RUNNING
-            self.started_at = datetime.now()
+            self.started_at = datetime.now() + timedelta(days=1)
             self.ended_at = self.started_at + timedelta(days=self.days)
             self.save()
 

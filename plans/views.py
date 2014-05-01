@@ -226,8 +226,8 @@ class BookingView(LoginRequiredMixin, TemplateView):
         Get all the stage meals and order by category
         """
         data = super(BookingView, self).get_context_data(**kwargs)
-        data.update(self.kwargs)
-        user_plan = UserPlan.objects.get(pk=self.kwargs['pk'])
+        data.update(kwargs)
+        user_plan = UserPlan.objects.get(pk=kwargs['pk'])
         breakfasts = user_plan.current_stage.stage.stagemeal_set.filter(category=BREAKFAST)  # noqa
         lunches = user_plan.current_stage.stage.stagemeal_set.filter(category=LUNCH)  # noqa
         suppers = user_plan.current_stage.stage.stagemeal_set.filter(category=SUPPER)  # noqa

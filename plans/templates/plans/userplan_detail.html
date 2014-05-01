@@ -42,14 +42,16 @@
                         </form>
                     </dt>
                     <dd class="timelineEvent" id="userstage_{{ stage_day.day.id }}EX" style="display:none;">
-                        <p>
+                        <p class="well well-sm">
                             {% for stage_meal in stage_day.day.get_meals.values %}
-                                <span>{{ stage_meal.label }}: </span>
-                                {% for meal in stage_meal.meals %}
-                                {{ meal.meal.name }}
-                                {% if not forloop.last %},{% endif %}
-                                {% endfor %}
-                                <br />
+                                {% if stage_meal.meals %}
+                                    <span>{{ stage_meal.label }}: </span>
+                                    {% for meal in stage_meal.meals %}
+                                    {{ meal.meal.name }}
+                                    {% if not forloop.last %},{% endif %}
+                                    {% endfor %}
+                                    <br />
+                                {% endif %}
                             {% endfor %}
                         </p>
                         <br class="clear">
@@ -62,7 +64,7 @@
                                 <span class="glyphicon glyphicon-remove"></span>
                             {% elif stage_day.status == UPCOMING %}
                                 {{ stage_day.date|date:'m月d日' }}
-                                <a href="{% url 'plans:booking' pk=user_stage.id %}">
+                                <a href="{% url 'plans:booking' pk=object.id %}">
                                     <span class="glyphicon glyphicon-shopping-cart"></span>订餐
                                 </a>
                             {% else %}
