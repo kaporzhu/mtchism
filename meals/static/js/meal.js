@@ -59,7 +59,7 @@ $(document).ready(function(){
         var id = $(this).data('id');
         var name = $(this).data('name');
         var limitations = $(this).data('limitations');
-        
+
         var price = parseFloat( $(this).data('price'));
         add_meal(id, name, price, limitations);
         load_meals();
