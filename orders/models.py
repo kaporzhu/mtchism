@@ -51,8 +51,8 @@ class Order(models.Model):
                          '取消订单</a>'.format(cancel_url)
             pay_url = reverse('orders:pay', kwargs={'pk': self.id})
             pay_btn = '<a href="{}" class="btn btn-primary btn-xs '\
-                      'pull-right">马上支付</a>'.format(pay_url)
-            return '{}{}'.format(cancel_btn, pay_btn)
+                      'pull-right">马上支付</a>&nbsp;'.format(pay_url)
+            return ' {}{}'.format(cancel_btn, pay_btn)
 
         return None
 

@@ -1,3 +1,9 @@
 #location {
     width: 350px;
 }
+
+.table td.title {
+    border: none;
+    padding-top: 40px;
+    font-size: 18px;
+}
