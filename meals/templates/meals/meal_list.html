@@ -1,5 +1,11 @@
 {% extends "base.html" %}
 
+{% load staticfiles %}
+
+{% block extrajs %}
+<script src="{% static 'js/meal-admin.js' %}"></script>
+{% endblock %}
+
 {% block title %}所有套餐{% endblock %}
 
 {% block content %}
@@ -7,6 +13,7 @@
 <div class="row">
     <div class="col-md-12">
         <form class="form-inline" role="form">
+            <input type="hidden" name="page" value="{{ page_obj.number }}" />
             <div class="form-group">
                 <span>早中晚：</span>
                 <select name="meal_type" class="form-control">
@@ -38,7 +45,6 @@
             <thead>
                 <tr>
                     <th>套餐名</th>
-                    <th>菜品</th>
                 </tr>
             </thead>
             <tbody>
@@ -46,27 +52,29 @@
                 <tr>
                     <td>
                         {{ meal.name }}({{ meal.price }})<small>[{{ meal.get_limitations_display }}][{{ meal.get_category_display }}]</small>
-                        <a href="{% url 'meals:update' pk=meal.id %}">
+                        <a class="btn btn-primary btn-xs" href="{% url 'meals:update' pk=meal.id %}">
                             <span class="glyphicon glyphicon-pencil"></span>
                         </a>
-                    </td>
-                    <td>
-                        <table class="table table-bordered table-hover">
+                        <a class="dishes-btn btn btn-primary btn-xs" href="javascript:void(0)">
+                            <span class="glyphicon glyphicon-chevron-down"></span>
+                        </a>
+                        <br /><br />
+                        <table class="table table-bordered hidden">
                             {% for dish in meal.dishes.all %}
-                            <tr>
+                            <tr class="info">
                                 <td>
                                     {{ dish.name }}
-                                    <a href="{% url 'meals:update_dish' meal_pk=meal.id pk=dish.id %}">
+                                    <a class="btn btn-primary btn-xs" href="{% url 'meals:update_dish' meal_pk=meal.id pk=dish.id %}">
                                         <span class="glyphicon glyphicon-pencil"></span>
                                     </a>
-                                    <a href="{% url 'meals:update_dish_foods' meal_pk=meal.id dish_pk=dish.id %}">
+                                    <a class="btn btn-primary btn-xs" href="{% url 'meals:update_dish_foods' meal_pk=meal.id dish_pk=dish.id %}">
                                         <span class="glyphicon glyphicon-th-list"></span>
                                     </a>
                                 </td>
                                 <td>
                                     <table class="table table-bordered table-hover">
                                         {% for dishfood in dish.dishfood_set.all %}
-                                        <tr>
+                                        <tr class="success">
                                             <td>{{ dishfood.food.name }}</td>
                                             <td>{{ dishfood.weight }}</td>
                                         </tr>
@@ -77,7 +85,7 @@
                             {% endfor %}
                             <tr>
                                 <td colspan="2">
-                                    <a href="{% url 'meals:create_dish' meal_pk=meal.id %}">
+                                    <a class="btn btn-primary btn-xs" href="{% url 'meals:create_dish' meal_pk=meal.id %}">
                                         <span class="glyphicon glyphicon-plus"></span>
                                     </a>
                                 </td>
@@ -87,14 +95,17 @@
                 </tr>
                 {% endfor %}
                 <tr>
-                    <td colspan="2">
-                        <a href="{% url 'meals:create' %}">
+                    <td colspan="1">
+                        <a class="btn btn-primary btn-xs" href="{% url 'meals:create' %}">
                             <span class="glyphicon glyphicon-plus"></span>
                         </a>
                     </td>
                 </tr>
             </tbody>
         </table>
+    </div>
+    <div class="col-md-12">
+        {% include "pagination.html" %}
     </div>
 </div>
 {% endblock %}

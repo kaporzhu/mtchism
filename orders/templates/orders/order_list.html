@@ -20,7 +20,7 @@
     <div class="col-md-12">
         <form class="form-inline" role="form">
             <div class="form-group">
-                <span>订单状态：</span>
+                <span>订单状态:</span>
                 <select name="status" class="form-control">
                     <option value="all">所有状态</option>
                     {% for choice in status_choices %}
@@ -32,9 +32,9 @@
                     {% endfor %}
                 </select>
             </div>
-            <br /><br />
+            &nbsp;&nbsp;
             <div class="form-group">
-                <span>套餐：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                <span>套餐:</span>
                 <select id="meal-type-select" name="meal-type" class="form-control">
                     <option value="all" class="default">所有套餐</option>
                     {% for choice in meal_type_choices %}
@@ -49,9 +49,9 @@
                     <option value="all" class="default">所有时段</option>
                 </select>
             </div>
-            <br /><br />
+            &nbsp;&nbsp;
             <div class="form-group">
-                <span>写字楼：&nbsp;&nbsp;&nbsp;</span>
+                <span>写字楼:</span>
                 <select name="building" class="form-control">
                     <option value="all">所有写字楼</option>
                     {% for b in buildings %}
@@ -68,7 +68,7 @@
             </div>
             <br /><br />
             <div class="form-group">
-                <span>创建时间：</span>
+                <span>创建时间:</span>
                 <input type="text" class="form-control datetime" value="{{ created_start_dt|date:'m/d/Y H:i' }}" name="created-start-datetime" />
                 <label> - </label>
                 <input type="text" class="form-control datetime" value="{{ created_end_dt|date:'m/d/Y H:i' }}" name="created-end-datetime" />
@@ -157,6 +157,9 @@
                 {% endfor %}
             </tbody>
         </table>
+    </div>
+    <div class="col-md-12">
+        {% include "pagination.html" %}
     </div>
 </div>
 

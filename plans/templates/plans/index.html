@@ -6,32 +6,68 @@
 
 <div class="row">
     <div class="col-md-12">
-        {% if user_plans %}
-        <ul class="list-group">
+        <div class="row">
             {% for user_plan in user_plans %}
-                {% if user_plan.status == JOINED %}
-                <li class="list-group-item">
-                    {{ user_plan.plan.name }}
-                    <a href="{% url 'plans:start_userplan' pk=user_plan.id %}" class="btn btn-primary btn-xs pull-right">开始</a>
-                </li>
-                {% else %}
-                <a href="{% url 'plans:userplan_detail' pk=user_plan.id %}" class="list-group-item"><span class="glyphicon glyphicon-ok"></span> {{ user_plan.plan.name }}</a>
+                {% if forloop.counter0|divisibleby:"3" %}
+                </div>
+                <div class="row">
                 {% endif %}
+                <div class="col-sm-4">
+                    <div class="plan panel panel-default">
+                        <div class="panel-heading"><strong>{{ user_plan.plan.name }}</strong></div>
+                        <div class="panel-body">
+                            {% if user_plan.status == JOINED %}
+                                <ul class="list-unstyled">
+                                    {% for stage in user_plan.plan.stage_set.all %}
+                                    <li>{{ stage.name }} - {{ stage.days }}天</li>
+                                    {% endfor %}
+                                </ul>
+                                <hr />
+                                <div class="text-center">
+                                    <a href="{% url 'plans:start_userplan' pk=user_plan.id %}" class="btn btn-primary">开始</a>
+                                </div>
+                            {% else %}
+                                <ul class="list-unstyled">
+                                    {% for userstage in user_plan.userstage_set.all %}
+                                    <li>{{ userstage.stage.name }} - {{ userstage.days }}天 - {{ userstage.get_status_display }}</li>
+                                    {% endfor %}
+                                </ul>
+                                <hr />
+                                <div class="text-center">
+                                    <a href="{% url 'plans:userplan_detail' pk=user_plan.id %}" class="btn btn-primary">进入</a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
             {% endfor %}
-        </ul>
-        {% endif %}
-        <br />
+        </div>
 
         {% if other_plans %}
         <p><small>更多...</small></p>
-        <ul class="list-group">
+        <div class="row">
             {% for plan in other_plans %}
-            <li class="list-group-item">
-                {{ plan.name }}
-                <a href="{% url 'plans:join' pk=plan.id %}" class="btn btn-primary btn-xs pull-right">加入</a>
-            </li>
+                {% if forloop.counter0|divisibleby:"3" %}
+                </div>
+                <div class="row">
+                {% endif %}
+                <div class="col-sm-4">
+                    <div class="plan panel panel-default">
+                        <div class="panel-heading"><strong>{{ plan.name }}</strong></div>
+                        <div class="panel-body">
+                            <ul class="list-unstyled">
+                                {% for stage in plan.stage_set.all %}
+                                <li>{{ stage.name }} - {{ stage.days }}天</li>
+                                {% endfor %}
+                            </ul>
+                            <div class="text-center">
+                                <a href="{% url 'plans:join' pk=plan.id %}" class="btn btn-default btn-sm">加入</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             {% endfor %}
-        </ul>
+        </div>
         {% endif %}
     </div>
 </div>

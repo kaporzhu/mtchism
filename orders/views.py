@@ -23,6 +23,7 @@ from .utils import get_tomorrow
 from buildings.models import Building
 from meals.constant import BREAKFAST, SUPPER, LUNCH, OTHER
 from meals.models import Meal
+from mtchism.mixins import PaginationMixin
 from plans.models import UserPlan, StageMeal, UserStageDay
 
 
@@ -187,11 +188,12 @@ class CancelOrderView(LoginRequiredMixin, RedirectView):
         return redirect(reverse('orders:mine'))
 
 
-class OrderListView(StaffuserRequiredMixin, ListView):
+class OrderListView(StaffuserRequiredMixin, PaginationMixin, ListView):
     """
     Display all the orders for the staff
     """
     model = Order
+    paginate_by = 15
 
     def get_params_from_request(self):
         """

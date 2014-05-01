@@ -15,6 +15,7 @@ from .constant import NORMAL
 from .forms import MealForm, DishForm, UpdateDishFoodsForm
 from .models import Meal, Dish, DishFood
 from foods.models import Food
+from mtchism.mixins import PaginationMixin
 
 
 class CreateMealView(StaffuserRequiredMixin, SetHeadlineMixin, CreateView):
@@ -58,11 +59,12 @@ class UpdateMealView(StaffuserRequiredMixin, SetHeadlineMixin, UpdateView):
         return kwargs
 
 
-class MealListView(StaffuserRequiredMixin, ListView):
+class MealListView(StaffuserRequiredMixin, PaginationMixin, ListView):
     """
     List view for meals
     """
     model = Meal
+    paginate_by = 15
 
     def get_context_data(self, **kwargs):
         """

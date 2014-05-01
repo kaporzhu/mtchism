@@ -3,16 +3,20 @@
 
 {% block title %}我的订单{% endblock %}
 
+{% block extracss %}
+<link rel="stylesheet" href="{% static 'css/order.css' %}">
+{% endblock %}
+
 {% block content %}
 
 <div class="row">
     <div class="col-md-12">
-        <table class="table table-bordered table-hover">
+        <table class="table">
             <tbody>
             {% for item in my_orders %}
                 {% if item.orders %}
                     <tr>
-                        <td colspan="5"><strong>{{ item.label }}</strong></td>
+                        <td colspan="5" class="title"><strong>{{ item.label }}</strong></td>
                     </tr>
                     {% for order in item.orders %}
                     <tr>
