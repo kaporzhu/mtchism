@@ -148,6 +148,34 @@ class UserStageTests(TestCase):
             str(user_stage),
             u'{}-{}'.format(user_stage.user.username, user_stage.stage))
 
+    def test_get_progress(self):
+        """
+        Check if the progress is returned
+        """
+        plan = PlanFactory()
+        stage = StageFactory(plan=plan)
+        user_plan = UserPlanFactory(plan=plan, status=JOINED)
+        user_plan.start()
+        user_stage = UserStage.objects.get(stage=stage)
+        user_stage.started_at = user_stage.started_at - timedelta(days=1)
+        progress = user_stage.get_progress()
+        self.assertEqual(len(progress), 1)
+        self.assertEqual(progress[0][0], 'danger')
+        UserStageDayFactory(user_stage=user_stage,
+                            date=(datetime.now() + timedelta(days=2)).date())
+        progress = user_stage.get_progress()
+        self.assertEqual(len(progress), 2)
+        self.assertEqual(progress[0][0], 'danger')
+        self.assertEqual(progress[1][0], 'success')
+        UserStageDayFactory(user_stage=user_stage,
+                            date=(datetime.now() + timedelta(days=4)).date())
+        progress = user_stage.get_progress()
+        self.assertEqual(len(progress), 4)
+        self.assertEqual(progress[0][0], 'danger')
+        self.assertEqual(progress[1][0], 'success')
+        self.assertEqual(progress[2][0], 'danger')
+        self.assertEqual(progress[3][0], 'success')
+
 
 class UserStageDayTests(TestCase):
     """

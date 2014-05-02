@@ -14,7 +14,7 @@
                 {% endif %}
                 <div class="col-sm-6">
                     <div class="plan panel panel-default">
-                        <div class="panel-heading"><strong>{{ user_plan.plan.name }}</strong></div>
+                        <div class="panel-heading">{{ user_plan.plan.name }}</div>
                         <div class="panel-body">
                             {% if user_plan.status == JOINED %}
                                 <ul class="list-unstyled">
@@ -30,6 +30,15 @@
                                 <ul class="list-unstyled">
                                     {% for userstage in user_plan.userstage_set.all %}
                                     <li>{{ userstage.stage.name }} - {{ userstage.days }}天 - {{ userstage.get_status_display }}</li>
+                                    <li>
+                                        <div class="progress">
+                                            {% for progress in userstage.get_progress %}
+                                            <div class="progress-bar progress-bar-{{ progress.0 }}" style="width: {{ progress.1 }}%">
+                                                <span class="sr-only">{{ progress.1 }}% Complete ({{ progress.0 }})</span>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </li>
                                     {% endfor %}
                                 </ul>
                                 <hr />

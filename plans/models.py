@@ -229,6 +229,59 @@ class UserStage(models.Model):
             date += timedelta(days=1)
         return days
 
+    def get_progress(self):
+        """
+        Get progress of the stage
+        """
+        tomorrow = (datetime.now() + timedelta(days=1)).date()
+        stage_days = self.userstageday_set.all().order_by('date')
+        count = stage_days.count()
+        index = 0
+        progress = []
+        last_status = None
+        last_status_count = 0
+        date = self.started_at.date()
+        for i in range(self.days):
+            if index < count:
+                day = stage_days[index]
+                if date == day.date:
+                    if not last_status:
+                        last_status_count = 1
+                        last_status = 'success'
+                    elif last_status == 'success':
+                        last_status_count += 1
+                    else:
+                        progress.append((last_status, last_status_count*100/self.days))
+                        last_status_count = 1
+                        last_status = 'success'
+                    index += 1
+                elif date < day.date:
+                    if not last_status:
+                        last_status_count = 1
+                        last_status = 'danger'
+                    elif last_status == 'danger':
+                        last_status_count += 1
+                    else:
+                        progress.append((last_status, last_status_count*100/self.days))
+                        last_status_count = 1
+                        last_status = 'danger'
+            else:
+                if tomorrow > date:
+                    if not last_status:
+                        last_status_count = 1
+                        last_status = 'danger'
+                    elif last_status == 'danger':
+                        last_status_count += 1
+                    else:
+                        progress.append((last_status, last_status_count*100/self.days))
+                        last_status_count = 1
+                        last_status = 'danger'
+                else:
+                    progress.append((last_status, last_status_count*100/self.days))
+                    break
+            date += timedelta(days=1)
+        return progress
+
     def __unicode__(self):
         return u'{}-{}'.format(self.user.username, self.stage)
 
